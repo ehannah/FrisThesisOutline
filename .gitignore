@@ -1,2 +1,6 @@
 #Ignore .DS_store files
 *.DS_store
+
+#Ignore the extra pdflatex stuff
+*.log
+*.aux
