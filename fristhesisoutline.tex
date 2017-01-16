@@ -186,8 +186,6 @@ A(\phi,\theta,\gamma)=A(\phi,\theta)=B(\theta)C(\phi)=\begin{bmatrix}
 \end{bmatrix}.
 \end{equation*}
 
-\blue{Really good job in this section. Very clear and concise.}
-
 \section{Angular Velocities}
 We can denote the angular velocities acting on the Frisbee as $\vec{w}_\phi$, $\vec{w}_\theta$, and $\vec{w}_\gamma$.  According to Goldstein, Poole, \& Safko, these angular velocities point along the "axes that their angles are rotated about."
 
@@ -233,8 +231,55 @@ Ultimately, grouping Euler's laws of motion together in terms of vectors and mat
 \vec{M}=I\dfrac{\vec{dw}}{dt}+\vec{\textit{w}}_F\times I \vec{w}
 \end{equation}
 
-\color{red} Explain derivations and report second derivative equations \color{black}
+\color{BurntOrange}
+Since we have already written explicit equations for $\textit{w}_F$ and $\textit{w}_{Total}$, we can write the righthand side of Equations 9 and 10 in terms of $\phi$, $\theta$, and $\gamma$. In doing so, we can derive \red{differential equations} that describe both the translational and angular accelerations of a Frisbee throughout its flight. These equations can be numerically integrated in order to determine the position and velocity of a disc at any time during its trajectory. 
 
+First, we calculate $\vec{w}_F\times\vec{v}$ as follows: 
+\begin{equation*}
+\vec{w}_F\times\vec{v}=\begin{bmatrix}
+w_x & w_y & w_z \\
+v_x & v_y & v_z \\
+\hat{x} & \hat{y} & \hat{z}
+\end{bmatrix}
+\end{equation*}
+
+\begin{equation*}
+=\left(\begin{array}{ccc} v_z\theta'-v_y(\gamma'+\phi'\sin\theta) \\ v_x(\gamma'+\phi'\sin\theta)-v_z\phi'\cos\theta \\ v_y\phi'\cos\theta-v_x\theta'\end{array}\right)
+\end{equation*}
+
+Substituting $\vec{w}_F\times\vec{v}$ into (9), we can solve for acceleration. Thus,
+
+\begin{equation}
+\frac{{dv}_x}{dt}=\frac{{F}_x-\theta'v_z+v_y(\phi'\sin\theta)}{m}
+\end{equation}
+
+\begin{equation}
+\frac{{dv}_y}{dt}=\frac{F_y-v_x\phi'\sin\theta+v_z\phi'\cos\theta}{m}
+\end{equation}
+
+\begin{equation}
+\frac{{dv}_z}{dt}=\frac{F_z-v_y\phi'\cos\theta+v_x\theta'}{m}
+\end{equation}
+
+Next, to solve for angular acceleration, we observe that 
+\begin{equation*}
+\frac{\vec{dw}}{dt}=\left(\begin{array}{ccc}\ddot\phi\cos\theta-\dot\phi\dot\theta\sin\theta\\ \ddot\theta \\ \ddot\phi\sin\theta + \dot\phi\dot\theta\cos\theta+\ddot\gamma\end{array} \right)
+\end{equation*}
+
+Substituting $\frac{\vec{dw}}{dt}$ into (10) and solving for $\ddot\phi$, $\ddot\theta$, and $\ddot\gamma$ yields,
+\begin{equation}
+\ddot\phi=\frac{M_x-I_{zz}\dot\theta(\dot\phi\sin\theta+\dot\gamma)+2I_{xx}\dot\phi\dot\theta\sin\theta}{I_{xx}\cos\theta}
+\end{equation}
+
+\begin{equation}
+\ddot\theta=\frac{M_y+I_{zz}\dot\phi\cos\theta(\dot\phi\sin\theta+\dot\gamma)-I_{yy}\dot\phi^2\sin\theta\cos\theta} {I_{yy}}
+\end{equation}
+
+\begin{equation}
+\ddot\gamma=\frac{M_z-I_{zz}(\dot\phi\dot\theta\cos\theta-\ddot\phi\sin\theta)}{I_{zz}}
+\end{equation}
+
+\color{black}
 \section{Works Cited (Tentative)}
 
 1. http://www.wfdf.org/history-stats/history-of-fyling-disc/4-history-of-the-frisbee
