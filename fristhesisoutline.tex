@@ -326,12 +326,22 @@ Equation 24 will be used to assess our Frisbee model.
 \subsection{Prior Function}
 We begin our analysis by defining a prior function ($\bold{P(\theta)}$) that is relevant to our simulated Frisbee throw. In general, this prior function should account for knowledge from past research and physically impossible conditions. However, given the lack of literature surrounding the trajectories of flying discs, such information cannot accurately be incorporated into our analysis.  Thus, because we have relatively little initial knowledge of the values our parameters should take, our model incorporates "flat" priors. 
 
-Based on the results in H3, we suspect the absolute values of $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, to be less than 1, and we expect the absolute value of $P_{L\alpha}$ to be less than 2. Therefore, we define $\bold{P(\left|\theta\right|>1)}=0$ for $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, and $\bold{P(\left|\theta\right|>2)}=0$ for $P_{L\alpha}$. When  $\bold{P(\theta)}=0$, $\ln\bold{P(\theta)}=-\infty$. These absolute value restrictions serve as our model's only flat priors.
+Based on the results in H3, we suspect the absolute values of $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, to be less than 1, and we expect the absolute value of $P_{L\alpha}$ to be less than 10. Therefore, we define $\bold{P(\left|\theta\right|>1)}=0$ for $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, and $\bold{P(\left|\theta\right|>10)}=0$ for $P_{L\alpha}$. When  $\bold{P(\theta)}=0$, then $\ln\bold{P(\theta)}=-\infty$. These absolute value restrictions serve as our model's only flat priors.
 
 Our prior function could be made more selective with information about the error measurements obtained by H3, P\&C, and others who have attempted to estimate a Frisbee's lift and drag parameters. For example, given error bars from previous parameter estimations, we could assume the existence of a Gaussian prior. 
 \subsection{Likelihood Function}
+\color{red}
+We continue our analysis by defining a likelihood function, $\bold{P({X}\given\theta})$. In our case, this likelihood function depends upon the Frisbee model described in Section 3, for which we assume Gaussian distribution. (That is, given a set of parameters, $\theta$, our model returns a dataset $\bold{X}$ that is normally distributed.) From this assumption, we can write, 
+\begin{equation*}
+\bold{P({X}\given\theta)}={\prod_{i=1}^{N} f(x,\theta)},
+\end{equation*}
+
+where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$, 
+\color{black}
 
 \color{black}
+\section{Results}
+
 \section{Works Cited (Tentative)}
 
 1. http://www.wfdf.org/history-stats/history-of-fyling-disc/4-history-of-the-frisbee
