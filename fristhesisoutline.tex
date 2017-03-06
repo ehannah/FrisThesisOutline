@@ -332,15 +332,22 @@ Our prior function could be made more selective with information about the error
 \subsection{Likelihood Function}
 \color{red}
 We continue our analysis by defining a likelihood function, $\bold{P({X}\given\theta})$. In our case, this likelihood function depends upon the Frisbee model described in Section 3, for which we assume Gaussian distribution. (That is, given a set of parameters, $\theta$, our model returns a dataset $\bold{X}$ that is normally distributed.) From this assumption, we can write, 
-\begin{equation*}
+\begin{equation}
 \bold{P({X}\given\theta)}={\prod_{i=1}^{N} f(x,\theta)},
-\end{equation*}
+\end{equation}
 
-where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$, 
-\color{black}
+where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$ and (in the absence of meaningful error bars) we have estimated $\sigma_i^2=0.5$ cm. Taking the natural logarithm of Eq. 25 yields,
+\begin{equation}
+\ln\bold{P({X}\given\theta)}={-0.5 \sum_{i=1}^{N} {(\frac { x_i-\bar{x} } {\sigma_{i}}})^2} - \frac{N}{2}\ln(2\pi\sigma_{i}^2),
+\end{equation}
 
-\color{black}
+\color{BurntOrange}
 \section{Results}
+\begin{figure}[H]
+        \includegraphics[width=12cm, height=12cm]{LiftDragCP}
+	\centering
+	\caption{}
+\end{figure}
 
 \section{Works Cited (Tentative)}
 
