@@ -12,6 +12,7 @@
 \usepackage{float}
 \usepackage{verbatim}
 \usepackage[normalem]{ulem}
+\usepackage{siunitx}
 \MakeOuterQuote{"}
 
 \newcommand{\red}[1]{\textcolor{red}{#1}}
@@ -303,18 +304,27 @@ Similarly, letting $\phi, \theta$, and $\gamma$ denote the Euler angles of the d
 \begin{equation}
 \frac{d\gamma}{dt}=\dot\gamma.
 \end{equation}
-where we obtain $\dot\phi, \dot\theta$, and $\dot\gamma$ via numerical integration of $\ddot\phi, \ddot\theta$, and $\ddot\gamma$. (Likewise, we obtain the components of $\vec{r}$ via numerical integration of $\frac{{dv}_x}{dt}, \frac{{dv}_y}{dt}$, and $\frac{{dv}_z}{dt}$.) It follows, then, that by integrating equations 19-22 over time $t_0$ to $t_f$, we can obtain the Euclidean positions and Euler angles of Frisbee, allowing us to simulate the flight of a flying disc. 
+where we obtain $\dot\phi, \dot\theta$, and $\dot\gamma$ via numerical integration of $\ddot\phi, \ddot\theta$, and $\ddot\gamma$. Likewise, we obtain the components of $\vec{r}$ via numerical integration of $\frac{{dv}_x}{dt}, \frac{{dv}_y}{dt}$, and $\frac{{dv}_z}{dt}$. It follows, then, that by integrating equations 19-22 over time $t_0$ to $t_f$, we can obtain the Euclidean positions and Euler angles of Frisbee, allowing us to simulate the flight coordinates of a flying disc. 
 
 \section{Parameter Estimation}
 \subsection{Bayes' Theorem}
-In order to estimate the parameters $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, this Honors Thesis will rely on Bayesian statistics. Specifically, we will use Markov Chain Monte Carlo analysis to calculate the probability distribution function of each of the four parameters. 
+In order to estimate the parameters $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, this Honors Thesis will rely on Bayesian statistics. Specifically, we will use Markov chain Monte Carlo analysis to sample the posterior probability distribution function of each of the four parameters. 
 
 Bayes' theorem can be expressed as follows:
 \begin{equation}
 \bold{P}(\theta\given\bold{X})=\frac{\bold{P(\theta})\cdot\bold{P({X}\given\theta})}{\bold{P(\bold{X})}},
 \end{equation}
-where $\theta$ denotes a set of unknown parameters and $\bold{X}$ denotes a known data set. For our analysis, $\theta$ specifically denotes an array of lift and drag parameters, and $\bold{X}$ denotes a data set obtained from a simulated Frisbee throw, including time, position, and velocity coordinates.
+where $\theta$ denotes a set of unknown parameters and $\bold{X}$ denotes a known data set. Here, $\theta$ is a vector that contains  $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $\bold{X}$ denotes a data set obtained from a simulated Frisbee throw, including time, position, and velocity coordinates. These coordinates were produced from our Frisbee model, which generated a trajectory using the specified parameter values shown below.
+\newline
+\begin{center}
+\begin{tabular}{| c | c | c | c | c | c | c | c | c |  c |}
+\hline
+$P_{L0}$ & $P_{L\alpha}$ & $P_{D0}$ & $P_{D\alpha}$  &  $P_{\tau_{x,\omega_x}}$ & $P_{\tau_{x,\omega_z}}$  & $P_{\tau_{y0}}$ & $P_{\tau_{y\alpha }}$ & $P_{\tau_{y,\omega_y}}$ & $P_{\tau_{z,\omega z }}$\\ \hline
+0.33 & 1.9 & 0.18 & 0.69 & 0.43 & \num{-1.4e-2} & \num{-8.2e-2} & \num{-1.2e-2} & \num{-1.7e-3} & \num{-3.4e-5} \\ \hline
+\end{tabular}
+\newline
 
+\end{center}
 The conditional probability $\bold{P(\theta\given\bold{X})}$ gives the posterior probability distribution of $\bold{\theta}$ given $\bold{X}$. $\bold{P({X}\given\theta})$, in contrast, gives the likelihood of the given data set conditional on certain parameters. $\bold{P(\theta)}$ is known as the prior, which describes any knowledge about $\theta$ that exists in the absence of details regarding $\bold{X}$.
 
 $\bold{P(\bold{X})}$ expresses the likelihood of our known data set $\bold{X}$. In practice we will ignore this term because we cannot determine the likelihood of $\bold{X}$ ahead of time without empirical evidence. Thus, rewriting Bayes' theorem in terms of natural logarithms, we have,
@@ -330,7 +340,7 @@ Based on the results in H3, we suspect the absolute values of $P_{D0}$, $P_{D\al
 
 Our prior function could be made more selective with information about the error measurements obtained by H3, P\&C, and others who have attempted to estimate a Frisbee's lift and drag parameters. For example, given error bars from previous parameter estimations, we could assume the existence of a Gaussian prior. 
 \subsection{Likelihood Function}
-\color{red}
+
 We continue our analysis by defining a likelihood function, $\bold{P({X}\given\theta})$. In our case, this likelihood function depends upon the Frisbee model described in Section 3, for which we assume Gaussian distribution. (That is, given a set of parameters, $\theta$, our model returns a dataset $\bold{X}$ that is normally distributed.) From this assumption, we can write, 
 \begin{equation}
 \bold{P({X}\given\theta)}={\prod_{i=1}^{N} f(x,\theta)},
@@ -338,8 +348,21 @@ We continue our analysis by defining a likelihood function, $\bold{P({X}\given\t
 
 where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$ and (in the absence of meaningful error bars) we have estimated $\sigma_i^2=0.5$ cm. Taking the natural logarithm of Eq. 25 yields,
 \begin{equation}
-\ln\bold{P({X}\given\theta)}={-0.5 \sum_{i=1}^{N} {(\frac { x_i-\bar{x} } {\sigma_{i}}})^2} - \frac{N}{2}\ln(2\pi\sigma_{i}^2),
+\ln\bold{P({X}\given\theta)}={-0.5 \sum_{i=1}^{N} {(\frac { x_i-\bar{x} } {\sigma_{i}}})^2} - \frac{N}{2}\ln(2\pi\sigma^2).
 \end{equation}
+
+Taking $-\frac{N}{2}\ln(2\pi\sigma^2)$ to be some constant, \textit{C}, we see that Equation 26 is simply a constant minus a $\chi^2$ distributed random variable. In other words, 
+\begin{equation*}
+\ln\bold{P({X}\given\theta)}=C-\chi^2.
+\end{equation*}
+In this case, we do not care about the true probability that a specific parameter will take a certain value. Rather, we are interested in the probability distribution of each parameter. Thus, we will ignore the constant \textit{C} and work with the following likelihood function:
+\begin{equation}
+\ln\bold{P({X}\given\theta)}={-0.5 \sum_{i=1}^{N} {(\frac { x_i-\bar{x} } {\sigma_{i}}})^2} \sim \chi^2.
+\end{equation}
+\subsection{Markov Chain Monte Carlo Analysis}
+From Equation 24, it is easy to see that by summing the prior function described in 4.2 and the likelihood function described in 4.3, we can calculate $\ln\bold{P}(\theta\given\bold{X})$, the (natural log) posterior probability distribution function of our parameters. From here, our objective is to sample the posterior using Markov chain Monte Carlo (MCMC) analysis. Specifically, we will apply the Metropolis-Hastings algorithm to marginalize the posterior distribution function and produce a chain that represents sampling from the posterior.
+
+
 
 \color{BurntOrange}
 \section{Results}
@@ -357,7 +380,9 @@ where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma
 4. http://www.usaultimate.org/about/\newline
 5. http://www.wfdf.org/news-media/news/press/2-official-communication/697-international-olympic-committee-grants-full-recognition-to-the-world-flying-disc-federation-wfdf
 6. Lorenz 2005 -- Flight and attitude dynamics measurements of an instrumented Frisbee 
-\end{document}  
 7. Cite a classical mechanics textbook (i.e. NOT wikipedia)
 8. Hubbard and Hummel (2000) -- Simulation of Frisbee Flight
 9. V.R. Morrison -- The Physics of Frisbees
+10. Hogg -- Fitting a model to data
+
+\end{document}  
