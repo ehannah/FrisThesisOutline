@@ -379,10 +379,15 @@ Since our data set did not have error bars, we arbitrarily assumed a constant er
 
 As described above, a coarse version of our simulated data set (100 FPS) was substituted for $\bold{X}$ in Equation 23. An array of parameters, $\theta$, was created such that the first four elements in the array were our unknowns ($P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$), and the remaining 6 elements were the true parameters used to generate the simulated data. $\bold{X}$ and $\theta$ as defined here were used to define Equation 24 in Python.
 
-Finally, a Python package called "emcee" was used to perform MCMC analysis on our flying disc model. Four walkers were initialized in parameter space with Gaussian distribution around the parameter values we aimed to recover. (From H3, we expect that $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$ take the values defined in Table 1.) A sampler in emcee was used to run MCMC for 20,000 steps, ultimately producing a chain of values for each parameter of interest.  This chain was used to generate a 4x4 corner plot illustrating the 2-d posterior probability distribution for each parameter. 
+Finally, a Python package called "emcee" was used to perform MCMC analysis on our flying disc model. Four walkers were initialized in parameter space with Gaussian distribution around the parameter values we aimed to recover. (From H3, we expect that $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$ take the values defined in Table 1.) A sampler in emcee was used to run MCMC for 20,000 steps, ultimately producing a chain of values for each parameter of interest.  This chain was used to generate a 4x4 corner plot illustrating the 2-d posterior probability distribution for each parameter. The mean value of each histogram along the diagonal of the 4x4 plot represented the maximum likelihood value of each parameter given our data set.
 
 \subsection{FPS Effects}
+After using MCMC analysis to whether we could recover the true lift and drag parameters used to simulate a Frisbee throw, we investigated the effects of increasingly coarse data sets on our ability to recover a single parameter ($P_{L0}$). From the original simulated data set, we created trajectories meant to replicate camera footage captured at 300 FPS, 150 FPS, 60 FPS, 30 FPS, 20 FPS, 12 FPS, 7.5 FPS, 6 FPS, 4 FPS, and 1 FPS.
+
+For each dataset, MCMC analysis was performed to produce a posterior probability distribution for $P_{L0}$. The mean and value of $P_{L0}$ was calculated for each FPS. The standard-deviation was also calculated for each camera speed. At lower FPS values, we expected larger standard deviations and less accurate recovery of the true parameter value for $P_{L0}$ (0.33).
+
 \section{Results}
+
 \begin{figure}[H]
         \includegraphics[width=12cm, height=12cm]{Final_PL0,PLa,PD0,PDa_nsteps=20,000_nwalkers=8}
 	\centering
