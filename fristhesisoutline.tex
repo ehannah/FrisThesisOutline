@@ -6,6 +6,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage[usenames, dvipsnames]{color}
+\usepackage[margin=1.5cm]{caption}
 \usepackage{subcaption}
 \usepackage [english]{babel}
 \usepackage [autostyle, english = american]{csquotes}
@@ -60,7 +61,7 @@ As mentioned above, understanding the dynamics of Frisbee flight may enable athl
  
 To date, the most comprehensive model of a thrown disc is described in \textit{Frisbee Flight Simulation and Throw Biomechanics}, published by Sarah Hummel in 2003 (referred to as H3 hereafter). H3 provides a nearly exhaustive review of currently available Frisbee literature and offers a model that builds on the work of (among others) Potts \& Crowther, Yasada, Mitchell, and Stilley \& Carstens (2). 
 
-Ultimately, the goals of this Honors Thesis are twofold. The first goal is to reproduce the model outlined in H3 using a format that is accessible to a relatively wide, general audience, and the second is to test this model against actual flight data obtained from video footage of thrown discs. By reproducing H3's work and refining the model where it fails to match reality, we can add to the existing body of Frisbee literature and help broaden the knowledge of flying disc dynamics for future researchers.
+Ultimately, the goals of this Honors Thesis are twofold. The first goal is to reproduce the model outlined in H3 using a format that is accessible to a relatively wide, general audience, and the second is to assess the model using Bayesian analysis. By reproducing H3's work and refining the model where it fails to match reality, we can add to the existing body of Frisbee literature and help broaden the knowledge of flying disc dynamics for future researchers.
 
 \section{Frisbee Model}
 
@@ -118,7 +119,7 @@ In order to produce a representative model of a Frisbee flight in three dimensio
 \end{figure}
 \end{comment}
 
-The magnitude of the torque around the \textit{x}-axis depends on two parameters, $P_{\tau_x\omega_x}$ and $P_{\tau_x\omega_z}$, which are multiplied by $\omega_x$ and $\omega_z$, respectively. From here, on $\omega$ denotes angular velocity. According to Hummel, Potts \& Crowther, and others,
+The magnitude of the torque around the \textit{x}-axis depends on two parameters, $P_{\tau_x\omega_x}$ and $P_{\tau_x\omega_z}$, which are multiplied by $\omega_x$ and $\omega_z$, respectively. From here on, $\omega$ denotes angular velocity. According to Hummel, Potts \& Crowther, and others,
 \begin{equation}
   \tau_x=(P_{\tau_x\omega_x}\omega_x+P_{\tau_x\omega_z}\omega_z)\frac{1}2Av^2d.
 \end{equation}
@@ -132,7 +133,7 @@ Similarly $\tau_y$ and $\tau_z$ are written as,
   \tau_z=(P_{\tau_z\omega_z}\omega_z)\frac{1}2Av^2d.
 \end{equation}
 
-Although this Honors Thesis will attempt to determine the values of the lift and drag parameters, as described above, it will not examine the torque parameters in such thorough detail. For reasons described in the Methods section, it was not possible to obtain accurate experimental data describing the angular positions of a Frisbee during flight. Thus, it was exceedingly difficult to produce meaningful experimental data about torques that could be used for parameter estimation.
+Although the torque parameters described above are critically important to the flight dynamics of Frisbees, this Honors Thesis will not examine them in great detail. Instead, we will focus here on the lift and drag parameters, choosing to simplify our analysis by concentrating solely on $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$. A truly comprehensive analysis of flying disc trajectories should expand the work described here to include the torque functions.
 
 \subsection{Newton's Equations of Motion} 
 
@@ -157,9 +158,9 @@ where $I_{xx}$=$I_{yy}$ and $I_{zz}$ is distinct (8).  The nature of $\vec{w}$ d
 
 \subsection{Euler Rotations} 
 
-Hummel's Frisbee model takes into account several reference frames, which are coordinate systems that describe an object's orientation.  In the following discussion, the term "lab frame" refers to an inertial \textit{x, y, z} reference frame, where the \textit{xy} plane is horizontal and the positive \textit{z} axis points upward.  (Note that H3 defines the +\textit{z} direction to be down, while here we define it to be up.) The term "frisbee frame" refers to a body-fixed coordinate system, \textit{x', y', z'}, in which the \textit{x'y'} plane lies on top of -- or parallel to -- the plane of the Frisbee.
+H3's Frisbee model takes into account several reference frames, which are coordinate systems that describe an object's orientation.  In the following discussion, the term "lab frame" refers to an inertial \textit{x, y, z} reference frame, where the \textit{xy} plane is horizontal and the positive \textit{z} axis points upward.  (Note that H3 defines the +\textit{z} direction to be down, while here we define it to be up.) The term "frisbee frame" refers to a body-fixed coordinate system, \textit{x', y', z'}, in which the \textit{x'y'} plane lies on top of -- or parallel to -- the plane of the Frisbee.
 
-We rotate the coordinates of a disc between the \textit{x,y,z} and \textit{x',y',z',} axes by performing a series of matrix rotations about intermediate sets of axes.  The rotations used here are those described in Hummel (2003), which rotate the Frisbee as follows: 1) about the \textit{x}-axis through angle $\phi$ into an intermediate set of axes denoted $\chi,\eta,\zeta$, 2) about the $\eta$-axis through angle $\theta$ into an intermediate set of axes denoted $\chi',\eta',\zeta'$, and 3) about the $\zeta'$ axis through angle $\gamma$ into \textit{x', y', z'}.
+We rotate the coordinates of a disc between the \textit{x,y,z} and \textit{x',y',z',} axes by performing a series of matrix rotations about intermediate sets of axes.  The rotations used here are those described in H3, which rotate the Frisbee as follows: 1) about the \textit{x}-axis through angle $\phi$ into an intermediate set of axes denoted $\chi,\eta,\zeta$, 2) about the $\eta$-axis through angle $\theta$ into an intermediate set of axes denoted $\chi',\eta',\zeta'$, and 3) about the $\zeta'$ axis through angle $\gamma$ into \textit{x', y', z'}.
 
 Rotations 1-3 are achieved with three rotation matrices, which can be multiplied together to form a single comprehensive rotation matrix. Rotation 1 can be expressed by the matrix,
 \begin{equation*}
@@ -243,7 +244,7 @@ Ultimately, grouping Euler's laws of motion together in terms of vectors and mat
 \vec{M}=I\dfrac{\vec{dw}}{dt}+\vec{\textit{w}}_F\times I \vec{w}
 \end{equation}
 
-Since we have already written explicit equations for $\textit{w}_F$ and $\textit{w}_{Total}$, we can write the righthand side of Equations 9 and 10 in terms of $\phi$, $\theta$, and $\gamma$. In doing so, we can derive ordinary differential equations (ODEs) that describe both the translational and angular accelerations of a Frisbee throughout its flight. These equations can be numerically integrated in order to determine the position and velocity of a disc at any time during its trajectory. 
+Since we have already written explicit equations for $\textit{w}_F$ and $\textit{w}_{Total}$, we can write the righthand side of Equations 9 and 10 in terms of $\phi$, $\theta$, and $\gamma$. In doing so, we can derive ordinary differential equations (ODEs) that describe both the translational and angular accelerations of a Frisbee throughout its flight. These second-order ODEs can be transformed into a system of first-order ODEs, which can be numerically integrated in order to determine the position and velocity of a disc at any time during its trajectory. 
 
 First, we calculate $\vec{w}_F\times\vec{v}$: 
 \begin{equation*}
@@ -283,11 +284,11 @@ Substituting (\ref{eq:dwdt}) into (10) and solving for $\ddot\phi$, $\ddot\theta
 \ddot\gamma=\frac{M_z-I_{zz}(\dot\phi\dot\theta\cos\theta-\ddot\phi\sin\theta)}{I_{zz}}
 \end{equation}
 
-At this point, we see that equations 12-17 are first order ODEs. Indeed, Equations 12, 13, and 14 calculate the translational acceleration of a disc in each direction at time \textit{t}, and Equations 15, 16, and 17 calculate the angular acceleration of a disc at time \textit{t}. Thus, by numerically integrating each of the six equations over a given period of time, we can obtain the velocity of a Frisbee at any point during its flight.
+At this point, we see that equations 12-17 are second-order ODEs. Equations 12-14 calculate the translational acceleration of a disc in each direction at time \textit{t}, and Equations 15-17 calculate the angular acceleration of a disc at time \textit{t}.
 
 \subsection{Position Coordinates}
 \color{BurntOrange}
-Once we know the velocity of a flying disc at time \textit{t}, we can perform another series of numerical integrations in order to obtain the position coordinates at time \textit{t}. Letting $\vec{r}=$ denote the \textit{x, y}, and \textit{z} Euclidean positions of a disc during its flight, then 
+Our goal is to use equations 12-17 to determine the positional coordinates of a Frisbee over the course of its trajectory. Letting $\vec{r}=$ denote the \textit{x, y}, and \textit{z} Euclidean positions of a disc during its flight, then 
 
 \begin{equation}
   \label{eq:position_deriv}
@@ -317,11 +318,13 @@ Bayes' theorem can be expressed as follows:
 where $\theta$ denotes a set of unknown parameters and $\bold{X}$ denotes a known data set. Here, $\theta$ is a vector that contains  $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $\bold{X}$ denotes a data set obtained from a simulated Frisbee throw, including time, position, and velocity coordinates. These coordinates were produced from our Frisbee model, which generated a trajectory using the specified parameter values shown below.
 \newline
 \begin{center}
+{\footnotesize
 \begin{tabular}{| c | c | c | c | c | c | c | c | c |  c |}
 \hline
 $P_{L0}$ & $P_{L\alpha}$ & $P_{D0}$ & $P_{D\alpha}$  &  $P_{\tau_{x,\omega_x}}$ & $P_{\tau_{x,\omega_z}}$  & $P_{\tau_{y0}}$ & $P_{\tau_{y\alpha }}$ & $P_{\tau_{y,\omega_y}}$ & $P_{\tau_{z,\omega z }}$\\ \hline
 0.33 & 1.9 & 0.18 & 0.69 & 0.43 & \num{-1.4e-2} & \num{-8.2e-2} & \num{-1.2e-2} & \num{-1.7e-3} & \num{-3.4e-5} \\ \hline
 \end{tabular}
+}
 \newline
 
 \end{center}
@@ -360,9 +363,22 @@ In this case, we do not care about the true probability that a specific paramete
 \ln\bold{P({X}\given\theta)}={-0.5 \sum_{i=1}^{N} {(\frac { x_i-\bar{x} } {\sigma_{i}}})^2} \sim \chi^2.
 \end{equation}
 \subsection{Markov Chain Monte Carlo Analysis}
-From Equation 24, it is easy to see that by summing the prior function described in 4.2 and the likelihood function described in 4.3, we can calculate $\ln\bold{P}(\theta\given\bold{X})$, the (natural log) posterior probability distribution function of our parameters. From here, our objective is to sample the posterior using Markov chain Monte Carlo (MCMC) analysis. Specifically, we will apply the Metropolis-Hastings algorithm to marginalize the posterior distribution function and produce a chain that represents sampling from the posterior.
+From Equation 24, it is easy to see that by summing the prior function described in 4.2 and the likelihood function described in 4.3, we can calculate $\ln\bold{P}(\theta\given\bold{X})$, the (natural log) posterior probability distribution function of our parameters. From here, our objective is to sample the posterior using Markov chain Monte Carlo (MCMC) analysis. Specifically, we will apply the Metropolis-Hastings algorithm to marginalize the posterior distribution function and produce a chain that represents a sampling from the posterior.
 
+\section{Methods}
+As described above, MCMC analysis was used to assess our flying disc model. First, a "fake" set of data points were produced by generating a trajectory under a specific set of initial conditions. The simulation replicated a camera speed of 300 frames per second (FPS) capturing video footage over a period of 3 seconds. A graphical representation of the trajectory produced by our model is shown in figure 4. 
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=16cm, height=10cm]{Simulated_throw_graph}
+	\caption{\color{red}State initial conditions and parameter values under which trajectory is produced.\color{black}}
+\end{figure}
+
+Since our data set did not have error bars, we arbitrarily assumed a constant error of 5 cm for each x, y, and z position in our "fake" trajectory. We created a text file containing a list of each time \textit{t}, a list of each x, y, and z position at time \textit{t}, and a list of error values for x(\textit{t}), y(\textit{t}), and z(\textit{t}). By removing certain timestamps from our simulated trajectory, it was possible to make the data either coarser or finer, in accordance with our overall goal. For example, pulling every 3rd timestamp (and corresponding position) from our data  allowed us to simulate camera footage captured at 100 FPS.
+
+As described above, a coarse version of our simulated data set (100 FPS) was substituted for $\bold{X}$ in Equation 23. An array of parameters, $\theta$, was created such that the first four elements in the array were our unknowns ($P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $\bold{X}$), and the remaining 6 elements were the true parameters used to generate the simulated data. $\bold{X}$ and $\theta$ as defined here were used to define Equation 24 in Python.
+
+Finally, a Python package called "emcee" was used to perform MCMC analysis on our flying disc model. Four walkers were initialized in parameter space
 
 \color{BurntOrange}
 \section{Results}
