@@ -315,7 +315,7 @@ Bayes' theorem can be expressed as follows:
 \begin{equation}
 \bold{P}(\theta\given\bold{X})=\frac{\bold{P(\theta})\cdot\bold{P({X}\given\theta})}{\bold{P(\bold{X})}},
 \end{equation}
-where $\theta$ denotes a set of unknown parameters and $\bold{X}$ denotes a known data set. Here, $\theta$ is a vector that contains  $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $\bold{X}$ denotes a data set obtained from a simulated Frisbee throw, including time, position, and velocity coordinates. These coordinates were produced from our Frisbee model, which generated a trajectory using the specified parameter values shown below.
+where $\theta$ denotes a set of unknown parameters and $\bold{X}$ denotes a known data set. Here, $\theta$ is a vector that contains  $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $\bold{X}$ denotes a data set obtained from a simulated Frisbee throw, including time, position, and velocity coordinates. These coordinates were produced from our Frisbee model, which generated a trajectory using the specified parameter values shown in Table 1 below.
 \newline
 \begin{center}
 {\footnotesize
@@ -366,6 +366,7 @@ In this case, we do not care about the true probability that a specific paramete
 From Equation 24, it is easy to see that by summing the prior function described in 4.2 and the likelihood function described in 4.3, we can calculate $\ln\bold{P}(\theta\given\bold{X})$, the (natural log) posterior probability distribution function of our parameters. From here, our objective is to sample the posterior using Markov chain Monte Carlo (MCMC) analysis. Specifically, we will apply the Metropolis-Hastings algorithm to marginalize the posterior distribution function and produce a chain that represents a sampling from the posterior.
 
 \section{Methods}
+\subsection{Parameter Recovery}
 As described above, MCMC analysis was used to assess our flying disc model. First, a "fake" set of data points were produced by generating a trajectory under a specific set of initial conditions. The simulation replicated a camera speed of 300 frames per second (FPS) capturing video footage over a period of 3 seconds. A graphical representation of the trajectory produced by our model is shown in figure 4. 
 
 \begin{figure}[H]
@@ -376,17 +377,31 @@ As described above, MCMC analysis was used to assess our flying disc model. Firs
 
 Since our data set did not have error bars, we arbitrarily assumed a constant error of 5 cm for each x, y, and z position in our "fake" trajectory. We created a text file containing a list of each time \textit{t}, a list of each x, y, and z position at time \textit{t}, and a list of error values for x(\textit{t}), y(\textit{t}), and z(\textit{t}). By removing certain timestamps from our simulated trajectory, it was possible to make the data either coarser or finer, in accordance with our overall goal. For example, pulling every 3rd timestamp (and corresponding position) from our data  allowed us to simulate camera footage captured at 100 FPS.
 
-As described above, a coarse version of our simulated data set (100 FPS) was substituted for $\bold{X}$ in Equation 23. An array of parameters, $\theta$, was created such that the first four elements in the array were our unknowns ($P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $\bold{X}$), and the remaining 6 elements were the true parameters used to generate the simulated data. $\bold{X}$ and $\theta$ as defined here were used to define Equation 24 in Python.
+As described above, a coarse version of our simulated data set (100 FPS) was substituted for $\bold{X}$ in Equation 23. An array of parameters, $\theta$, was created such that the first four elements in the array were our unknowns ($P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$), and the remaining 6 elements were the true parameters used to generate the simulated data. $\bold{X}$ and $\theta$ as defined here were used to define Equation 24 in Python.
 
-Finally, a Python package called "emcee" was used to perform MCMC analysis on our flying disc model. Four walkers were initialized in parameter space
+Finally, a Python package called "emcee" was used to perform MCMC analysis on our flying disc model. Four walkers were initialized in parameter space with Gaussian distribution around the parameter values we aimed to recover. (From H3, we expect that $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$ take the values defined in Table 1.) A sampler in emcee was used to run MCMC for 20,000 steps, ultimately producing a chain of values for each parameter of interest.  This chain was used to generate a 4x4 corner plot illustrating the 2-d posterior probability distribution for each parameter. 
 
-\color{BurntOrange}
+\subsection{FPS Effects}
 \section{Results}
 \begin{figure}[H]
-        \includegraphics[width=12cm, height=12cm]{LiftDragCP}
+        \includegraphics[width=12cm, height=12cm]{Final_PL0,PLa,PD0,PDa_nsteps=20,000_nwalkers=8}
 	\centering
-	\caption{}
+	\caption{\color{red} Describe plot.}
 \end{figure}
+
+\begin{figure}[H]
+        \includegraphics[width=10cm, height=6cm]{meanvsFPS}
+	\centering
+	\caption{\color{red} Describe plot.}
+\end{figure}
+
+\begin{figure}[H]
+        \includegraphics[width=10cm, height=6cm]{errortomeanratiovsFPS}
+	\centering
+	\caption{\color{red} Describe plot.}
+\end{figure}
+
+
 
 \section{Works Cited (Tentative)}
 
@@ -394,11 +409,13 @@ Finally, a Python package called "emcee" was used to perform MCMC analysis on ou
 2. Hummel thesis \newline
 3. Should I cite some sort of observation here? [\blue{Yes, potts and crowther and the others}]\newline
 4. http://www.usaultimate.org/about/\newline
-5. http://www.wfdf.org/news-media/news/press/2-official-communication/697-international-olympic-committee-grants-full-recognition-to-the-world-flying-disc-federation-wfdf
-6. Lorenz 2005 -- Flight and attitude dynamics measurements of an instrumented Frisbee 
-7. Cite a classical mechanics textbook (i.e. NOT wikipedia)
-8. Hubbard and Hummel (2000) -- Simulation of Frisbee Flight
-9. V.R. Morrison -- The Physics of Frisbees
-10. Hogg -- Fitting a model to data
+5. http://www.wfdf.org/news-media/news/press/2-official-communication/697-international-olympic-committee-grants-full-recognition-to-the-world-flying-disc-federation-wfdf\newline
+6. Lorenz 2005 -- Flight and attitude dynamics measurements of an instrumented Frisbee \newline
+7. Cite a classical mechanics textbook (i.e. NOT wikipedia)\newline
+8. Hubbard and Hummel (2000) -- Simulation of Frisbee Flight\newline
+9. V.R. Morrison -- The Physics of Frisbees\newline
+10. Hogg -- Fitting a model to data\newline
+11. Emcee in python -- http://dan.iel.fm/emcee/current/user/line/\newline
+
 
 \end{document}  
