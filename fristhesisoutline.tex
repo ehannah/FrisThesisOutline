@@ -53,7 +53,7 @@ In the late 1940s, Walter Frederick Morrison designed and manufactured the first
 
 While Wham-O continues to hold a trademark on the term "Frisbee," numerous companies (including Discraft, Innova, EuroDisc, and others) have emerged as competitors in the flying disc market. It is worth mentioning here that, while all flying discs retain the same basic shape, it is possible to observe subtle differences in the trajectories of their flights.  A Frisbee produced by Wham-O, for example, may veer to one direction at the end of a backhand throw, while an Ultrastar produced by Discraft may tail in the opposite direction at the end of a similar throw (3).  As disc sports become increasingly competitive, it will be in the best interest of athletes, coaches, and fans to better understand the aerodynamics of of flying discs.
 
-Despite the recent growth of disc sports, the current body of Frisbee research remains relatively limited. Previous research has developed physics-based models of flying discs, but these models have yet to be refined such that they can predict the flight trajectory of any disc given any set of initial conditions. In particular, the accuracy of the existing models depends heavily on the accuracy of experimental flight data, which is difficult to obtain (2).
+Despite the recent growth of disc sports, the current body of Frisbee research remains relatively limited. Previous research has developed physics-based models of flying discs, but these models have yet to be refined such that they can predict the flight trajectory of any disc given any set of initial conditions. In particular, the accuracy of the existing models depends heavily on the accuracy of experimental flight data, which is difficult to obtain (2). \blue{This last sentence is ambiguous - is the data difficult to obtain or is high accuracy hard to obtain?}
 
 \subsection{Motivation for Research}
 
@@ -61,7 +61,7 @@ As mentioned above, understanding the dynamics of Frisbee flight may enable athl
  
 To date, the most comprehensive model of a thrown disc is described in \textit{Frisbee Flight Simulation and Throw Biomechanics}, published by Sarah Hummel in 2003 (referred to as H3 hereafter). H3 provides a nearly exhaustive review of currently available Frisbee literature and offers a model that builds on the work of (among others) Potts \& Crowther, Yasada, Mitchell, and Stilley \& Carstens (2). 
 
-Ultimately, the goals of this Honors Thesis are twofold. The first goal is to reproduce the model outlined in H3 using a format that is accessible to a relatively wide, general audience, and the second is to assess the model using Bayesian analysis. By reproducing H3's work and refining the model where it fails to match reality, we can add to the existing body of Frisbee literature and help broaden the knowledge of flying disc dynamics for future researchers.
+Ultimately, the goals of this Honors Thesis are twofold. The first goal is to reproduce the model outlined in H3 using a format that is accessible to a relatively wide, general audience, and the second is to assess the model using Bayesian analysis. By reproducing H3's work and refining the model where it fails to match reality, we can add to the existing body of Frisbee literature and help broaden the knowledge of flying disc dynamics for future researchers.\blue{You can also state the specific goals, now that we know them. These are to set constraints on the FPS of cameras used to obtain data, and set limits on the accuracy of object tracking codes used to find trajectories. All results up to now should be taken with a grain of salt, since none of the data acquisition techniques were vetted at all.}
 
 \section{Frisbee Model}
 
@@ -134,19 +134,23 @@ Similarly $\tau_y$ and $\tau_z$ are written as,
 \end{equation}
 
 Although the torque parameters described above are critically important to the flight dynamics of Frisbees, this Honors Thesis will not examine them in great detail. Instead, we will focus here on the lift and drag parameters, choosing to simplify our analysis by concentrating solely on $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$. A truly comprehensive analysis of flying disc trajectories should expand the work described here to include the torque functions.
+\blue{Make sure you state somewhere that you chose to fix the $P_{torque}$ parameters to some value, and then state the values you fixed them to.}
 
 \subsection{Newton's Equations of Motion} 
 
 According to classical mechanics, the motion of rigid bodies can be described by two of Newton's equations, which relate an object's translational and rotational trajectory to the sum of the forces and torques acting upon it (7).  The Newton-Euler equations of motion are derived from Newton's two laws of motion for rigid bodies:
 \begin{equation}
-\vec{F}=\textit{m}\vec{a}
+  \label{eq:newton1}
+  \vec{F}=\textit{m}\vec{a}
 \end{equation}
 \begin{equation}
-\vec{M}=\dfrac{\vec{dL}}{dt}
+  \label{eq:newton2}
+  \vec{M}=\dfrac{\vec{dL}}{dt}
 \end{equation}
-Equation 1 states that the sum of the forces acting upon a rigid body is equal to the product of the body's mass $(\textit{m})$ and its acceleration $(\vec{a})$, where $\vec{a}$ is simply a time derivative of the body's velocity.  
+\blue{You had these two equations incorrectly numbered in the next two paragraphs. I fixed this. Remove this comment once you have read it.}
+Equation \ref{eq:newton1} states that the sum of the forces acting upon a rigid body is equal to the product of the body's mass $(\textit{m})$ and its acceleration $(\vec{a})$, where $\vec{a}$ is simply a time derivative of the body's velocity.  \blue{Why are these quantities in parentheses?}
 
-Equation 2 states that a rigid body's angular momentum $(\vec{dL}/dt)$ changes at a rate equal to the sum of the torques $(\vec{M})$ acting upon it. Here we have $\vec{L}$=\textit{I}$\vec{w}$, where \textit{I} is the mass moment of inertia matrix and $\vec{w}$ is the body's angular velocity vector. Due to the axial symmetry of a disc, the inertial matrix for a Frisbee is defined as,  
+Equation \ref{eq:newton2} states that a rigid body's angular momentum $(\vec{dL}/dt)$ changes at a rate equal to the sum of the torques $(\vec{M})$ acting upon it. Here we have $\vec{L}$=\textit{I}$\vec{w}$, where \textit{I} is the mass moment of inertia matrix and $\vec{w}$ is the body's angular velocity vector. Due to the axial symmetry of a disc, the inertial matrix for a Frisbee is defined as,  
 \begin{equation*}
 I=\begin{bmatrix}
 I_{xx} & 0 & 0 \\
@@ -158,7 +162,7 @@ where $I_{xx}$=$I_{yy}$ and $I_{zz}$ is distinct (8).  The nature of $\vec{w}$ d
 
 \subsection{Euler Rotations} 
 
-H3's Frisbee model takes into account several reference frames, which are coordinate systems that describe an object's orientation.  In the following discussion, the term "lab frame" refers to an inertial \textit{x, y, z} reference frame, where the \textit{xy} plane is horizontal and the positive \textit{z} axis points upward.  (Note that H3 defines the +\textit{z} direction to be down, while here we define it to be up.) The term "frisbee frame" refers to a body-fixed coordinate system, \textit{x', y', z'}, in which the \textit{x'y'} plane lies on top of -- or parallel to -- the plane of the Frisbee.
+H3's Frisbee model takes into account several reference frames, which are coordinate systems that describe an object's orientation.  In the following discussion, the term "lab frame" refers to an inertial reference frame \blue{specified by Cartesian coordinates $x,y,z$}, where the \textit{xy} plane is horizontal and the positive \textit{z} axis points upward.  (Note that H3 defines the +\textit{z} direction to be down, while here we define it to be up.) The term "frisbee frame" refers to a body-fixed coordinate system, \textit{x', y', z'}, in which the \textit{x'y'} plane lies on top of -- or parallel to -- the plane of the Frisbee. (\blue{This paragraph is really good. Nice!})
 
 We rotate the coordinates of a disc between the \textit{x,y,z} and \textit{x',y',z',} axes by performing a series of matrix rotations about intermediate sets of axes.  The rotations used here are those described in H3, which rotate the Frisbee as follows: 1) about the \textit{x}-axis through angle $\phi$ into an intermediate set of axes denoted $\chi,\eta,\zeta$, 2) about the $\eta$-axis through angle $\theta$ into an intermediate set of axes denoted $\chi',\eta',\zeta'$, and 3) about the $\zeta'$ axis through angle $\gamma$ into \textit{x', y', z'}.
 
@@ -189,7 +193,7 @@ D(\gamma)=\begin{bmatrix}
 \end{bmatrix}.
 \end{equation*}
 
-In general, we would express the final Euler rotation matrix as a combination of B, C, and D. However, for the purposes of modeling a Frisbee trajectory, we have chosen to rotate the original \textit{x, y, z} axis simply onto the plane of the disc, not onto the spinning disc. This choice was made for the sake of simplifying the model and the numerical calculations it requires (2). Rotating the \textit{x, y, z} axis onto the plane of the disc only requires rotations 1 and 2, which rotate through $\phi$ and $\theta$, respectively.
+In general, we would express the final Euler rotation matrix as a product of B, C, and D. However, for the purposes of modeling a Frisbee trajectory, we have chosen to rotate the original $x, y, z$ axes only onto the plane of the disc, not onto the spinning disc. This choice was made for the sake of simplifying the model and the numerical calculations it requires (2). Rotating the $x, y, z$ axis onto the plane of the disc only requires rotations 1 and 2, which rotate through $\phi$ and $\theta$, respectively.
 
 Therefore, the complete rotation matrix is described as follows:
 
@@ -202,6 +206,9 @@ A(\phi,\theta,\gamma)=A(\phi,\theta)=B(\theta)C(\phi)=\begin{bmatrix}
 \end{equation*}
 
 \subsection{Angular Velocities}
+
+\blue{Angular velocities don't ACT on things, they are properites of them. Just like a car doesn't have speed `act' on it. It's just moving.}
+
 We can denote the angular velocities acting on the Frisbee as $\vec{w}_\phi$, $\vec{w}_\theta$, and $\vec{w}_\gamma$.  According to Goldstein, Poole, \& Safko, these angular velocities point along the "axes that their angles are rotated about."
 
 Consider, for example, $\vec{w}_\phi$.  Before performing any rotations, the vector $(\dot\phi, 0, 0)$ points along the original \textit{x}-axis.  The original \textit{x}-axis is ultimately rotated through angles $\phi$ and $\theta$ via matrices C and B, as described above. In other words, the original \textit{x}-axis undergoes a full transformation by the matrix A$(\phi,\theta)$. Therefore, in order to determine the direction of $\vec{w}_\phi$, we must rotate $(\dot\phi, 0, 0)$ about angles $\phi$ and $\theta$.  This rotation yields:
@@ -238,13 +245,19 @@ The angular velocity of the Frisbee itself accounts for the final component, $\v
 
 Ultimately, grouping Euler's laws of motion together in terms of vectors and matrices yields the Newton-Euler equations of motion (expressed below), which are assumed to govern the flight paths of Frisbees (H3). 
 \begin{equation}
-\vec{F}=\textit{m}(\dfrac{\vec{dv}}{dt}+\vec{\textit{w}}_F\times\vec{v})
+  \label{eq:newton3}
+  \vec{F}=\textit{m}(\dfrac{\vec{dv}}{dt}+\vec{\textit{w}}_F\times\vec{v})
 \end{equation}
 \begin{equation}
-\vec{M}=I\dfrac{\vec{dw}}{dt}+\vec{\textit{w}}_F\times I \vec{w}
+  \label{eq:newton4}
+  \vec{M}=I\dfrac{\vec{dw}}{dt}+\vec{\textit{w}}_F\times I \vec{w}
 \end{equation}
 
+\blue{Just to be clear, equation \ref{eq:newton3} is NOT what we program. I'm not actually totally sure why.}
+
 Since we have already written explicit equations for $\textit{w}_F$ and $\textit{w}_{Total}$, we can write the righthand side of Equations 9 and 10 in terms of $\phi$, $\theta$, and $\gamma$. In doing so, we can derive ordinary differential equations (ODEs) that describe both the translational and angular accelerations of a Frisbee throughout its flight. These second-order ODEs can be transformed into a system of first-order ODEs, which can be numerically integrated in order to determine the position and velocity of a disc at any time during its trajectory. 
+
+\blue{STOP! YOU HAVE MIXED NOTATION FOR TIME DERIVATIVES!! You use dot notation $(\dot{\theta})$ in the section above, and you use dash notation $(\theta')$ below. This is difficult to read because these derivaives have different meanings to physicists. Everything should be dot notation. Fix this.}
 
 First, we calculate $\vec{w}_F\times\vec{v}$: 
 \begin{equation*}
@@ -288,6 +301,7 @@ At this point, we see that equations 12-17 are second-order ODEs. Equations 12-1
 
 \subsection{Position Coordinates}
 \color{BurntOrange}
+\blue{You have hard coded ``equations 12-17'', but the numbers have changed. Learn to use the ref\{\} and label\{\} tools.}
 Our goal is to use equations 12-17 to determine the positional coordinates of a Frisbee over the course of its trajectory. Letting $\vec{r}=$ denote the \textit{x, y}, and \textit{z} Euclidean positions of a disc during its flight, then 
 
 \begin{equation}
@@ -330,13 +344,14 @@ $P_{L0}$ & $P_{L\alpha}$ & $P_{D0}$ & $P_{D\alpha}$  &  $P_{\tau_{x,\omega_x}}$ 
 \end{center}
 The conditional probability $\bold{P(\theta\given\bold{X})}$ gives the posterior probability distribution of $\bold{\theta}$ given $\bold{X}$. $\bold{P({X}\given\theta})$, in contrast, gives the likelihood of the given data set conditional on certain parameters. $\bold{P(\theta)}$ is known as the prior, which describes any knowledge about $\theta$ that exists in the absence of details regarding $\bold{X}$.
 
-$\bold{P(\bold{X})}$ expresses the likelihood of our known data set $\bold{X}$. In practice we will ignore this term because we cannot determine the likelihood of $\bold{X}$ ahead of time without empirical evidence. Thus, rewriting Bayes' theorem in terms of natural logarithms, we have,
+$\bold{P(\bold{X})}$ expresses the likelihood of our known data set $\bold{X}$. In practice we will ignore this term because we cannot determine the likelihood of $\bold{X}$ ahead of time without empirical evidence.\blue{(To put it another way, it is a normalization that doesn't depend on our model at all.)} Thus, rewriting Bayes' theorem in terms of natural logarithms, we have,
 \begin{equation}
 \ln\bold{P}(\theta\given\bold{X})=\ln{\bold{P(\theta})+\ln\bold{P({X}\given\theta})}.
 \end{equation}
 
 Equation 24 will be used to assess our Frisbee model.
 \subsection{Prior Function}
+\blue{Stop putting everything into parentheses.}
 We begin our analysis by defining a prior function ($\bold{P(\theta)}$) that is relevant to our simulated Frisbee throw. In general, this prior function should account for knowledge from past research and physically impossible conditions. However, given the lack of literature surrounding the trajectories of flying discs, such information cannot accurately be incorporated into our analysis.  Thus, because we have relatively little initial knowledge of the values our parameters should take, our model incorporates "flat" priors. 
 
 Based on the results in H3, we suspect the absolute values of $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, to be less than 1, and we expect the absolute value of $P_{L\alpha}$ to be less than 10. Therefore, we define $\bold{P(\left|\theta\right|>1)}=0$ for $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, and $\bold{P(\left|\theta\right|>10)}=0$ for $P_{L\alpha}$. When  $\bold{P(\theta)}=0$, then $\ln\bold{P(\theta)}=-\infty$. These absolute value restrictions serve as our model's only flat priors.
@@ -349,7 +364,7 @@ We continue our analysis by defining a likelihood function, $\bold{P({X}\given\t
 \bold{P({X}\given\theta)}={\prod_{i=1}^{N} f(x,\theta)},
 \end{equation}
 
-where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$ and (in the absence of meaningful error bars) we have estimated $\sigma_i^2=0.5$ cm. Taking the natural logarithm of Eq. 25 yields,
+where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$ and (in the absence of meaningful error bars) we have estimated $\sigma_i^2=0.5$ cm. \blue{(This has a physical meaning though - we believe this to be approximately the error that will come out of video tracking algorithms. In other words, those algorithms will be accurate to ~5 cm.)} Taking the natural logarithm of Eq. 25 yields,
 \begin{equation}
 \ln\bold{P({X}\given\theta)}={-0.5 \sum_{i=1}^{N} {(\frac { x_i-\bar{x} } {\sigma_{i}}})^2} - \frac{N}{2}\ln(2\pi\sigma^2).
 \end{equation}
@@ -367,6 +382,7 @@ From Equation 24, it is easy to see that by summing the prior function described
 
 \section{Methods}
 \subsection{Parameter Recovery}
+\blue{Don't say `fake', say `synthetic', or else it sounds like BS.}
 As described above, MCMC analysis was used to assess our flying disc model. First, a "fake" set of data points were produced by generating a trajectory under a specific set of initial conditions. The simulation replicated a camera speed of 300 frames per second (FPS) capturing video footage over a period of 3 seconds. A graphical representation of the trajectory produced by our model is shown in figure 4. 
 
 \begin{figure}[H]
