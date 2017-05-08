@@ -29,23 +29,17 @@
 
 \newcommand*{\myinfinity}{{\propto}}
 
-\title{Thesis Outline -- Very Drafty Draft}
+\title{Constraining Frisbee Tracking Methods Through Bayesian Analysis of Flying Disc Models}
 \author{Lizzie Hannah}
 \date{\today}
 
 \begin{document}
 \maketitle
-\section{Abstract}
-\section{Introduction}
 
 \blue{Tom comments in blue.}
-
 \green{Things to remove/change are in green.}
+\section{Introduction}
 
-\blue{Some terms are repeated very frequently, 
-  such as references to Hummel 2003. 
-  You should abbreviate it as H3 the first time it's used and
-  just use the abbreviation from then on.}
 \subsection{History of Flying Discs}
 Flying discs have long provided a source of entertainment for dogs and humans alike.  The modern Frisbee -- first produced by Wham-O Inc. toy company in 1957 -- is today a staple in household toy boxes across the United States.  While the precise details of the Frisbee's history continue to be a source of debate, experts generally credit Civil War era baker William Russel Frisbie with designing the baking tin that ultimately became the first Frisbee prototype.  Yale University students purchased Frisbie's pies and played catch by tossing their empty tins around; thus the idea for the Frisbee was borne (1).  
 
@@ -53,7 +47,7 @@ In the late 1940s, Walter Frederick Morrison designed and manufactured the first
 
 While Wham-O continues to hold a trademark on the term "Frisbee," numerous companies (including Discraft, Innova, EuroDisc, and others) have emerged as competitors in the flying disc market. It is worth mentioning here that, while all flying discs retain the same basic shape, it is possible to observe subtle differences in the trajectories of their flights.  A Frisbee produced by Wham-O, for example, may veer to one direction at the end of a backhand throw, while an Ultrastar produced by Discraft may tail in the opposite direction at the end of a similar throw (3).  As disc sports become increasingly competitive, it will be in the best interest of athletes, coaches, and fans to better understand the aerodynamics of of flying discs.
 
-Despite the recent growth of disc sports, the current body of Frisbee research remains relatively limited. Previous research has developed physics-based models of flying discs, but these models have yet to be refined such that they can predict the flight trajectory of any disc given any set of initial conditions. In particular, the accuracy of the existing models depends heavily on the accuracy of experimental flight data, which is difficult to obtain (2). \blue{This last sentence is ambiguous - is the data difficult to obtain or is high accuracy hard to obtain?}
+Despite the recent growth of disc sports, the current body of Frisbee research remains relatively limited. Previous research has developed physics-based models of flying discs, but these models have yet to be refined such that they can predict the flight trajectory of any disc given any set of initial conditions. In particular, the accuracy of the existing models depends heavily on the accuracy of experimental flight data, which is difficult to obtain with high accuracy (2).
 
 \subsection{Motivation for Research}
 
@@ -61,7 +55,7 @@ As mentioned above, understanding the dynamics of Frisbee flight may enable athl
  
 To date, the most comprehensive model of a thrown disc is described in \textit{Frisbee Flight Simulation and Throw Biomechanics}, published by Sarah Hummel in 2003 (referred to as H3 hereafter). H3 provides a nearly exhaustive review of currently available Frisbee literature and offers a model that builds on the work of (among others) Potts \& Crowther, Yasada, Mitchell, and Stilley \& Carstens (2). 
 
-Ultimately, the goals of this Honors Thesis are twofold. The first goal is to reproduce the model outlined in H3 using a format that is accessible to a relatively wide, general audience, and the second is to assess the model using Bayesian analysis. By reproducing H3's work and refining the model where it fails to match reality, we can add to the existing body of Frisbee literature and help broaden the knowledge of flying disc dynamics for future researchers.\blue{You can also state the specific goals, now that we know them. These are to set constraints on the FPS of cameras used to obtain data, and set limits on the accuracy of object tracking codes used to find trajectories. All results up to now should be taken with a grain of salt, since none of the data acquisition techniques were vetted at all.}
+Ultimately, the goals of this Honors Thesis are twofold. The first goal is to reproduce the model outlined in H3 using a format that is accessible to a relatively wide, general audience, and the second is to assess the model using Bayesian analysis. By reproducing H3's work and refining the model where it fails to match reality, we can add to the existing body of Frisbee literature and help broaden the knowledge of flying disc dynamics for future researchers. Specifically, we aim to set constraints on the frames per second (FPS) of cameras used to obtain data, and set limits on the accuracy of object tracking codes used to find trajectories. All results up to now should be taken with a grain of salt, since none of the data acquisition techniques were vetted at all.
 
 \section{Frisbee Model}
 
@@ -133,8 +127,7 @@ Similarly $\tau_y$ and $\tau_z$ are written as,
   \tau_z=(P_{\tau_z\omega_z}\omega_z)\frac{1}2Av^2d.
 \end{equation}
 
-Although the torque parameters described above are critically important to the flight dynamics of Frisbees, this Honors Thesis will not examine them in great detail. Instead, we will focus here on the lift and drag parameters, choosing to simplify our analysis by concentrating solely on $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$. A truly comprehensive analysis of flying disc trajectories should expand the work described here to include the torque functions.
-\blue{Make sure you state somewhere that you chose to fix the $P_{torque}$ parameters to some value, and then state the values you fixed them to.}
+Although the torque parameters described above are critically important to the flight dynamics of Frisbees, this Honors Thesis will not examine them in great detail. Instead, we will focus here on the lift and drag parameters, choosing to simplify our analysis by concentrating solely on $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$. The torque parameters will be fixed at the values reported in Table 1. A truly comprehensive analysis of flying disc trajectories should expand the work described here to include the torque functions.
 
 \subsection{Newton's Equations of Motion} 
 
@@ -147,8 +140,7 @@ According to classical mechanics, the motion of rigid bodies can be described by
   \label{eq:newton2}
   \vec{M}=\dfrac{\vec{dL}}{dt}
 \end{equation}
-\blue{You had these two equations incorrectly numbered in the next two paragraphs. I fixed this. Remove this comment once you have read it.}
-Equation \ref{eq:newton1} states that the sum of the forces acting upon a rigid body is equal to the product of the body's mass $(\textit{m})$ and its acceleration $(\vec{a})$, where $\vec{a}$ is simply a time derivative of the body's velocity.  \blue{Why are these quantities in parentheses?}
+Equation \ref{eq:newton1} states that the sum of the forces acting upon a rigid body is equal to the product of the body's mass $\textit{m}$ and its acceleration $\vec{a}$, where $\vec{a}$ is simply a time derivative of the body's velocity.  
 
 Equation \ref{eq:newton2} states that a rigid body's angular momentum $(\vec{dL}/dt)$ changes at a rate equal to the sum of the torques $(\vec{M})$ acting upon it. Here we have $\vec{L}$=\textit{I}$\vec{w}$, where \textit{I} is the mass moment of inertia matrix and $\vec{w}$ is the body's angular velocity vector. Due to the axial symmetry of a disc, the inertial matrix for a Frisbee is defined as,  
 \begin{equation*}
@@ -162,7 +154,7 @@ where $I_{xx}$=$I_{yy}$ and $I_{zz}$ is distinct (8).  The nature of $\vec{w}$ d
 
 \subsection{Euler Rotations} 
 
-H3's Frisbee model takes into account several reference frames, which are coordinate systems that describe an object's orientation.  In the following discussion, the term "lab frame" refers to an inertial reference frame \blue{specified by Cartesian coordinates $x,y,z$}, where the \textit{xy} plane is horizontal and the positive \textit{z} axis points upward.  (Note that H3 defines the +\textit{z} direction to be down, while here we define it to be up.) The term "frisbee frame" refers to a body-fixed coordinate system, \textit{x', y', z'}, in which the \textit{x'y'} plane lies on top of -- or parallel to -- the plane of the Frisbee. (\blue{This paragraph is really good. Nice!})
+H3's Frisbee model takes into account several reference frames, which are coordinate systems that describe an object's orientation.  In the following discussion, the term "lab frame" refers to an inertial reference frame specified by Cartesian coordinates $x,y,z$, where the \textit{xy} plane is horizontal and the positive \textit{z} axis points upward.  (Note that H3 defines the +\textit{z} direction to be down, while here we define it to be up.) The term "frisbee frame" refers to a body-fixed coordinate system, \textit{x', y', z'}, in which the \textit{x'y'} plane lies on top of -- or parallel to -- the plane of the Frisbee. 
 
 We rotate the coordinates of a disc between the \textit{x,y,z} and \textit{x',y',z',} axes by performing a series of matrix rotations about intermediate sets of axes.  The rotations used here are those described in H3, which rotate the Frisbee as follows: 1) about the \textit{x}-axis through angle $\phi$ into an intermediate set of axes denoted $\chi,\eta,\zeta$, 2) about the $\eta$-axis through angle $\theta$ into an intermediate set of axes denoted $\chi',\eta',\zeta'$, and 3) about the $\zeta'$ axis through angle $\gamma$ into \textit{x', y', z'}.
 
@@ -207,9 +199,7 @@ A(\phi,\theta,\gamma)=A(\phi,\theta)=B(\theta)C(\phi)=\begin{bmatrix}
 
 \subsection{Angular Velocities}
 
-\blue{Angular velocities don't ACT on things, they are properites of them. Just like a car doesn't have speed `act' on it. It's just moving.}
-
-We can denote the angular velocities acting on the Frisbee as $\vec{w}_\phi$, $\vec{w}_\theta$, and $\vec{w}_\gamma$.  According to Goldstein, Poole, \& Safko, these angular velocities point along the "axes that their angles are rotated about."
+We can denote the angular velocities of the Frisbee as $\vec{w}_\phi$, $\vec{w}_\theta$, and $\vec{w}_\gamma$.  According to Goldstein, Poole, \& Safko, these angular velocities point along the "axes that their angles are rotated about."
 
 Consider, for example, $\vec{w}_\phi$.  Before performing any rotations, the vector $(\dot\phi, 0, 0)$ points along the original \textit{x}-axis.  The original \textit{x}-axis is ultimately rotated through angles $\phi$ and $\theta$ via matrices C and B, as described above. In other words, the original \textit{x}-axis undergoes a full transformation by the matrix A$(\phi,\theta)$. Therefore, in order to determine the direction of $\vec{w}_\phi$, we must rotate $(\dot\phi, 0, 0)$ about angles $\phi$ and $\theta$.  This rotation yields:
 
@@ -253,29 +243,27 @@ Ultimately, grouping Euler's laws of motion together in terms of vectors and mat
   \vec{M}=I\dfrac{\vec{dw}}{dt}+\vec{\textit{w}}_F\times I \vec{w}
 \end{equation}
 
-\blue{Just to be clear, equation \ref{eq:newton3} is NOT what we program. I'm not actually totally sure why.}
-
 Since we have already written explicit equations for $\textit{w}_F$ and $\textit{w}_{Total}$, we can write the righthand side of Equations 9 and 10 in terms of $\phi$, $\theta$, and $\gamma$. In doing so, we can derive ordinary differential equations (ODEs) that describe both the translational and angular accelerations of a Frisbee throughout its flight. These second-order ODEs can be transformed into a system of first-order ODEs, which can be numerically integrated in order to determine the position and velocity of a disc at any time during its trajectory. 
 
-\blue{STOP! YOU HAVE MIXED NOTATION FOR TIME DERIVATIVES!! You use dot notation $(\dot{\theta})$ in the section above, and you use dash notation $(\theta')$ below. This is difficult to read because these derivaives have different meanings to physicists. Everything should be dot notation. Fix this.}
+%\blue{STOP! YOU HAVE MIXED NOTATION FOR TIME DERIVATIVES!! You use dot notation $(\dot{\theta})$ in the section above, and you use dash notation $(\theta')$ below. This is difficult to read because these derivaives have different meanings to physicists. Everything should be dot notation. Fix this.}
 
 First, we calculate $\vec{w}_F\times\vec{v}$: 
 \begin{equation*}
-\vec{w}_F\times\vec{v}=\left(\begin{array}{ccc} v_z\theta'-v_y(\gamma'+\phi'\sin\theta) \\ v_x(\gamma'+\phi'\sin\theta)-v_z\phi'\cos\theta \\ v_y\phi'\cos\theta-v_x\theta'\end{array}\right).
+\vec{w}_F\times\vec{v}=\left(\begin{array}{ccc} v_z\dot\theta-v_y(\dot\gamma+\dot\phi\sin\theta) \\ v_x(\dot\gamma+\dot\phi\sin\theta)-v_z\dot\phi\cos\theta \\ v_y\dot\phi\cos\theta-v_x\dot\theta\end{array}\right).
 \end{equation*}
 
 Substituting $\vec{w}_F\times\vec{v}$ into (9), we can solve for acceleration. Thus,
 
 \begin{equation}
-\frac{{dv}_x}{dt}=\frac{{F}_x-\theta'v_z+v_y(\phi'\sin\theta)}{m}
+\frac{{dv}_x}{dt}=\frac{{F}_x-\dot\theta v_z+v_y(\dot\phi\sin\theta)}{m}
 \end{equation}
 
 \begin{equation}
-\frac{{dv}_y}{dt}=\frac{F_y-v_x\phi'\sin\theta+v_z\phi'\cos\theta}{m}
+\frac{{dv}_y}{dt}=\frac{F_y-v_x\dot\phi\sin\dot\theta+v_z\dot\phi\cos\theta}{m}
 \end{equation}
 
 \begin{equation}
-\frac{{dv}_z}{dt}=\frac{F_z-v_y\phi'\cos\theta+v_x\theta'}{m}
+\frac{{dv}_z}{dt}=\frac{F_z-v_y\dot\phi\cos\theta+v_x\dot\theta}{m}
 \end{equation}
 
 Next, to solve for angular acceleration, we observe that 
@@ -297,12 +285,11 @@ Substituting (\ref{eq:dwdt}) into (10) and solving for $\ddot\phi$, $\ddot\theta
 \ddot\gamma=\frac{M_z-I_{zz}(\dot\phi\dot\theta\cos\theta-\ddot\phi\sin\theta)}{I_{zz}}
 \end{equation}
 
-At this point, we see that equations 12-17 are second-order ODEs. Equations 12-14 calculate the translational acceleration of a disc in each direction at time \textit{t}, and Equations 15-17 calculate the angular acceleration of a disc at time \textit{t}.
+At this point, have a system of second-order ODEs. Equations 12-14 calculate the translational acceleration of a disc in each direction at time \textit{t}, and Equations 16-18 calculate the angular acceleration of a disc at time \textit{t}.
 
 \subsection{Position Coordinates}
-\color{BurntOrange}
-\blue{You have hard coded ``equations 12-17'', but the numbers have changed. Learn to use the ref\{\} and label\{\} tools.}
-Our goal is to use equations 12-17 to determine the positional coordinates of a Frisbee over the course of its trajectory. Letting $\vec{r}=$ denote the \textit{x, y}, and \textit{z} Euclidean positions of a disc during its flight, then 
+ %\blue{You have hard coded ``equations 12-17'', but the numbers have changed. Learn to use the ref\{\} and label\{\} tools.}
+Our goal is to use equations 12-14 and 16-18 to determine the positional coordinates of a Frisbee over the course of its trajectory. Letting $\vec{r}=$ denote the \textit{x, y}, and \textit{z} Euclidean positions of a disc during its flight, then 
 
 \begin{equation}
   \label{eq:position_deriv}
@@ -344,15 +331,14 @@ $P_{L0}$ & $P_{L\alpha}$ & $P_{D0}$ & $P_{D\alpha}$  &  $P_{\tau_{x,\omega_x}}$ 
 \end{center}
 The conditional probability $\bold{P(\theta\given\bold{X})}$ gives the posterior probability distribution of $\bold{\theta}$ given $\bold{X}$. $\bold{P({X}\given\theta})$, in contrast, gives the likelihood of the given data set conditional on certain parameters. $\bold{P(\theta)}$ is known as the prior, which describes any knowledge about $\theta$ that exists in the absence of details regarding $\bold{X}$.
 
-$\bold{P(\bold{X})}$ expresses the likelihood of our known data set $\bold{X}$. In practice we will ignore this term because we cannot determine the likelihood of $\bold{X}$ ahead of time without empirical evidence.\blue{(To put it another way, it is a normalization that doesn't depend on our model at all.)} Thus, rewriting Bayes' theorem in terms of natural logarithms, we have,
+$\bold{P(\bold{X})}$ expresses the likelihood of our known data set $\bold{X}$. In practice we will ignore this term because we cannot determine the likelihood of $\bold{X}$ ahead of time without empirical evidence. To put it another way, we impose a normalization that doesn't depend on our model at all. Thus, rewriting Bayes' theorem in terms of natural logarithms, we have,
 \begin{equation}
 \ln\bold{P}(\theta\given\bold{X})=\ln{\bold{P(\theta})+\ln\bold{P({X}\given\theta})}.
 \end{equation}
 
 Equation 24 will be used to assess our Frisbee model.
 \subsection{Prior Function}
-\blue{Stop putting everything into parentheses.}
-We begin our analysis by defining a prior function ($\bold{P(\theta)}$) that is relevant to our simulated Frisbee throw. In general, this prior function should account for knowledge from past research and physically impossible conditions. However, given the lack of literature surrounding the trajectories of flying discs, such information cannot accurately be incorporated into our analysis.  Thus, because we have relatively little initial knowledge of the values our parameters should take, our model incorporates "flat" priors. 
+We begin our analysis by defining a prior function $\bold{P(\theta)}$ that is relevant to our simulated Frisbee throw. In general, this prior function should account for knowledge from past research and physically impossible conditions. However, given the lack of literature surrounding the trajectories of flying discs, such information cannot accurately be incorporated into our analysis.  Thus, because we have relatively little initial knowledge of the values our parameters should take, our model incorporates "flat" priors. 
 
 Based on the results in H3, we suspect the absolute values of $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, to be less than 1, and we expect the absolute value of $P_{L\alpha}$ to be less than 10. Therefore, we define $\bold{P(\left|\theta\right|>1)}=0$ for $P_{D0}$, $P_{D\alpha}$ and $P_{L0}$, and $\bold{P(\left|\theta\right|>10)}=0$ for $P_{L\alpha}$. When  $\bold{P(\theta)}=0$, then $\ln\bold{P(\theta)}=-\infty$. These absolute value restrictions serve as our model's only flat priors.
 
@@ -364,7 +350,7 @@ We continue our analysis by defining a likelihood function, $\bold{P({X}\given\t
 \bold{P({X}\given\theta)}={\prod_{i=1}^{N} f(x,\theta)},
 \end{equation}
 
-where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$ and (in the absence of meaningful error bars) we have estimated $\sigma_i^2=0.5$ cm. \blue{(This has a physical meaning though - we believe this to be approximately the error that will come out of video tracking algorithms. In other words, those algorithms will be accurate to ~5 cm.)} Taking the natural logarithm of Eq. 25 yields,
+where $f(x,\theta)=(2\pi\sigma_{i}^2)^{-1/2}e^{-\frac{(x_{i}-\bar{x})^2}{2\sigma_i^2}}$ and (in the absence of meaningful error bars) we have estimated $\sigma_i^2=0.5$ cm.  We believe this to be approximately the error that will come out of video tracking algorithms. In other words, those algorithms will be accurate to ~5 cm. Taking the natural logarithm of Eq. 25 yields,
 \begin{equation}
 \ln\bold{P({X}\given\theta)}={-0.5 \sum_{i=1}^{N} {(\frac { x_i-\bar{x} } {\sigma_{i}}})^2} - \frac{N}{2}\ln(2\pi\sigma^2).
 \end{equation}
@@ -382,8 +368,7 @@ From Equation 24, it is easy to see that by summing the prior function described
 
 \section{Methods}
 \subsection{Parameter Recovery}
-\blue{Don't say `fake', say `synthetic', or else it sounds like BS.}
-As described above, MCMC analysis was used to assess our flying disc model. First, a "fake" set of data points were produced by generating a trajectory under a specific set of initial conditions. The simulation replicated a camera speed of 300 frames per second (FPS) capturing video footage over a period of 3 seconds. A graphical representation of the trajectory produced by our model is shown in figure 4. 
+As described above, MCMC analysis was used to assess our flying disc model. First, a synthetic set of data points were produced by generating a trajectory under a specific set of initial conditions. The simulation replicated a camera speed of 300 FPS capturing video footage over a period of 3 seconds. A graphical representation of the trajectory produced by our model is shown in figure 4. 
 
 \begin{figure}[H]
 	\centering
@@ -391,11 +376,11 @@ As described above, MCMC analysis was used to assess our flying disc model. Firs
 	\caption{\color{red}State initial conditions and parameter values under which trajectory is produced.\color{black}}
 \end{figure}
 
-Since our data set did not have error bars, we arbitrarily assumed a constant error of 5 cm for each x, y, and z position in our "fake" trajectory. We created a text file containing a list of each time \textit{t}, a list of each x, y, and z position at time \textit{t}, and a list of error values for x(\textit{t}), y(\textit{t}), and z(\textit{t}). By removing certain timestamps from our simulated trajectory, it was possible to make the data either coarser or finer, in accordance with our overall goal. For example, pulling every 3rd timestamp (and corresponding position) from our data  allowed us to simulate camera footage captured at 100 FPS.
+Since our data set did not have error bars, we arbitrarily assumed a constant error of 5 cm for each x, y, and z position in our synthetic trajectory. We created a text file containing a list of each time \textit{t}, a list of each x, y, and z position at time \textit{t}, and a list of error values for x(\textit{t}), y(\textit{t}), and z(\textit{t}). By removing certain timestamps from our simulated trajectory, it was possible to make the data either coarser or finer, in accordance with our overall goal. For example, pulling every 3rd timestamp (and corresponding position) from our data  allowed us to simulate camera footage captured at 100 FPS.
 
 As described above, a coarse version of our simulated data set (100 FPS) was substituted for $\bold{X}$ in Equation 23. An array of parameters, $\theta$, was created such that the first four elements in the array were our unknowns ($P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$), and the remaining 6 elements were the true parameters used to generate the simulated data. $\bold{X}$ and $\theta$ as defined here were used to define Equation 24 in Python.
 
-Finally, a Python package called "emcee" was used to perform MCMC analysis on our flying disc model. Four walkers were initialized in parameter space with Gaussian distribution around the parameter values we aimed to recover. (From H3, we expect that $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$ take the values defined in Table 1.) A sampler in emcee was used to run MCMC for 20,000 steps, ultimately producing a chain of values for each parameter of interest.  This chain was used to generate a 4x4 corner plot illustrating the 2-d posterior probability distribution for each parameter. The mean value of each histogram along the diagonal of the 4x4 plot represented the maximum likelihood value of each parameter given our data set.
+Finally, a Python package called "emcee" was used to perform MCMC analysis on our flying disc model. Four walkers were initialized in parameter space with Gaussian distribution around the parameter values we aimed to recover. (From H3, we expect that $P_{D0}, P_{D\alpha}, P_{L0}$, and $P_{L\alpha}$, and $P_{L0}$ take the values defined in Table 1.) A sampler in emcee was used to run MCMC for 20,000 steps, ultimately producing a chain of values for each parameter of interest.  This chain was used to generate a 4x4 corner plot illustrating the 2-d posterior probability distribution for each parameter. The mean value $\mu$ of each histogram along the diagonal of the 4x4 plot represented the maximum likelihood value of each parameter given our data set.
 
 \subsection{FPS Effects}
 After using MCMC analysis to whether we could recover the true lift and drag parameters used to simulate a Frisbee throw, we investigated the effects of increasingly coarse data sets on our ability to recover a single parameter ($P_{L0}$). From the original simulated data set, we created trajectories meant to replicate camera footage captured at 300 FPS, 150 FPS, 60 FPS, 30 FPS, 20 FPS, 12 FPS, 7.5 FPS, 6 FPS, 4 FPS, and 1 FPS.
@@ -404,17 +389,26 @@ For each dataset, MCMC analysis was performed to produce a posterior probability
 
 \section{Results}
 
+By generating a set of synthetic Frisbee flight coordinates and comparing the data to our model via Bayesian analysis, we assessed the ability of our model to recover the parameters used to simulate a thrown disc. Figure 5 depicts a 4x4 corner plot with the histograms along the diagonal showing the posterior probability distribution functions for our four lift parameters. As indicated in Figure 5, the maximum likelihood values of each parameter given our synthetic data points were $P_{D0} = 0.18, P_{D\alpha}=0.69, P_{L0}=0.33$, and $P_{L\alpha}=1.9$. These recovered values aligned precisely with the values used to generate our simulated data set.
+
+
 \begin{figure}[H]
         \includegraphics[width=12cm, height=12cm]{Final_PL0,PLa,PD0,PDa_nsteps=20,000_nwalkers=8}
 	\centering
 	\caption{\color{red} Describe plot.}
 \end{figure}
+The non-diagonal plots depicted in Figure 5 yield information about the correlation between individual parameters. It indicates that $P_{D0}$ is inversely correlated with $P_{D\alpha}$, and that $P_{L0}$ is inversely correlated with $P_{L\alpha}$. That is, if we increase $P_{D\alpha}$ and $P_{L\alpha}$, $P_{D0}$ and $P_{L0}$ will decrease. These correlations agree with what we would expect, since both the lift and drag coefficients depend on their respective parameters only through $\alpha$, as reflected in Equations 3 and 4. In contrast, Figure 5 shows that there is no correlation between the lift and drag parameters. Again, we expect this result because the lift coefficient does not depend on the drag parameters, and likewise the drag coefficient does not depend on the lift parameters.
 
+Figure 5 demonstrates that we can use Bayesian analysis to compare an experimental Frisbee trajectory to the one generated by our model under the same set of initial conditions. It further shows that, given a synthetic data set, such statistical analysis accurately recovers the known parameters used to simulate a thrown disc. Future data will not compare our model to a synthetic data set, but rather to experimental Frisbee trajectories presumably captured using video cameras.  Thus, going forward it will be highly important to understand the quality of the footage necessary to extract meaningful data.
+
+To test the robustness of our Bayesian analysis given increasingly coarse data, we recorded the mean value of $P_{L0}$ for simulated Frisbee flights captured at 300, 150, 100, 600, 30, 20, 12, 7, 6, 4, and 3 FPS. As expected, at low FPS values, the recovered mean value of $P_{L0}$ varied significantly more around the true mean (0.33) than it did at high FPS values (Figure 6).
 \begin{figure}[H]
         \includegraphics[width=10cm, height=6cm]{meanvsFPS}
 	\centering
 	\caption{\color{red} Describe plot.}
 \end{figure}
+
+We further quantified the effects of decreasing FPS on our ability to recover known Frisbee flight parameters by plotting $\mu/\sigma^2$ of our recovered $P_{L0}$ versus FPS for each FPS value (Figure 7). Again, as we would expect, this ratio decreases with increasing FPS due to decreasing $\sigma^2$ error. Around 250 FPS, the slope of $\mu/\sigma^2$ vs. FPS begins to level off, indicating that the $\sigma^2$ is remaining relatively stable around 0.001. 
 
 \begin{figure}[H]
         \includegraphics[width=10cm, height=6cm]{errortomeanratiovsFPS}
@@ -422,7 +416,7 @@ For each dataset, MCMC analysis was performed to produce a posterior probability
 	\caption{\color{red} Describe plot.}
 \end{figure}
 
-
+Figures 6 and 7 suggest that a video camera that captures footage at a rate of 300 FPS may be sufficient to produce footage of flying discs that can be analyzed using the approach presented here. Expensive, high-speed cameras that capture at rates faster than 300 FPS are optimal for object tracking, but they may not be necessary to carry out our proposed parameter recovery method.
 
 \section{Works Cited (Tentative)}
 
