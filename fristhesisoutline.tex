@@ -15,6 +15,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{siunitx}
 \usepackage{url}
+\usepackage{subcaption}
 
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -51,7 +52,24 @@ In the late 1940s, Walter Frederick Morrison designed and manufactured the first
 
 While Wham-O continues to hold a trademark on the term "Frisbee," numerous companies (including Discraft, Innova, EuroDisc, and others) have emerged as competitors in the flying disc market. It is worth mentioning here that, while all flying discs retain the same basic shape, it is possible to observe subtle differences in the trajectories of their flights.  A thick, heavy discus, for example, flies along an entirely different trajectory than a small, light clay pigeon, which in turn travels in a manner distinct from that of a standard Frisbee \cite{pottsandcrowther2007}. As disc sports become increasingly competitive, it will be in the best interest of athletes, coaches, and fans to better understand the aerodynamics of of flying discs.
 
-\red{[Pics of discus, Frisbee, and clay pigeon]}
+\begin{figure}[h]
+\centering
+	\begin{subfigure}[b]{0.25\textwidth}
+		\includegraphics[width=3cm, height=3cm]{discus}
+		\caption{1 kg, 18 cm \newline diameter discus. }
+    		\label{fig:1}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.25\textwidth}
+		\includegraphics[width=3cm, height=2.5cm]{claypig}
+		\caption{105 g, 110 mm \newline diameter clay pigeon.}
+   		 \label{fig:2}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.25\textwidth}
+		\includegraphics[width=3cm, height=3cm]{discraftultra}
+		\caption{175 g, 273.05 mm diameter Frisbee.}
+    		\label{fig:3}
+	\end{subfigure}
+\end{figure}
 
 Despite the recent growth of disc sports, the current body of Frisbee research remains relatively limited. Previous research has developed physics-based models of flying discs, but these models have yet to be refined such that they can predict the flight trajectory of any disc given any set of initial conditions \cite{H3, pottsandcrowther2007, yasuda, mitchell, stilleyandcarstens, morrison}. In particular, the accuracy of the existing models depends heavily on the accuracy of experimental flight data, which is difficult to obtain with without expensive equipment and sophisticated tracking software \cite{H3}.
 
