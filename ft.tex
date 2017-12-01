@@ -404,7 +404,7 @@ From Equation 24, it is easy to see that by summing the prior function described
 By plotting histograms of our samples for each drag and lift parameter, we can approximate each marginalized posterior probability distribution function. We can then estimate the the parameter values most likely to have produced our data (i.e. the maximum likelihood values) by determining the peak value of each histogram. Although there exist multiple ways to run MCMC algorithms on computers, here we will employ a Python package called "emcee" to implement our analysis.
 \section{Methods}
 \subsection{Parameter Recovery}
-Having outlined 1) a model of a Frisbee flight and 2) a way to estimate Frisbee lift and drag parameters given a set of data, we employed the Bayesian approach described above to recover a set of known parameters used to produce a simulated trajectory. The Python code written to produce the following work is stored in a GitHub repository and can be accessed at https://github.com/ehannah/FrisbeeResearch. 
+Having outlined 1) a model of a Frisbee flight and 2) a way to estimate Frisbee lift and drag parameters given a set of data, we employed the Bayesian approach described above to recover a set of known parameters used to produce a simulated trajectory. The Python code written to produce the following work is stored in a GitHub repository and can be accessed at https://github.com/ehannah/FrisbeeResearch and partially reprinted in Appendices A-D. 
 
 First, a synthetic set of data points were produced by generating a trajectory under a specific set of initial conditions. The simulation replicated a camera speed of 300 FPS capturing video footage over a period of 3 seconds. A graphical representation of the trajectory produced by our model is shown in Figure 3. 
 \begin{figure}[h]
@@ -466,5 +466,581 @@ This Honors Thesis would not have been possible without the generous, consistent
 
 \bibliography{thesisrefs1}
 \bibliographystyle{plain}
+\section*{Appendix}
+\section*{Appendix A}
+\begin{verbatim}
+"""
+This file creates a 'model object' which is initalized with 
+a Frisbee's parameter values. This file calculates the
+amplitudes of the lift force, drag force, and
+torques about each principle axis.
 
+For more information see, e.g. Hummel 2003.
+
+Developers: Tom McClintock, Elizabeth Hannah
+"""
+import numpy
+import matplotlib.pyplot as plt 
+"""
+Constants:
+PI
+alpha_0: angle of attack of minimum drag. See Hummel 2003
+"""
+PI = 3.141592653589793
+alpha_0 = 4.0*PI/180. 
+
+class Model(object):
+	def __init__(self,*args):
+                """
+                Constructor
+
+                PL0: lift parameter at 0 angle of attack (alpha)
+                PLa: linear lift parameter that multiplies angle of attack
+                PD0: drag parameter at alpha_0
+                PDa: quadratic drag parameter, multiplies square angle of attack
+                PTy0: y-axis torque parameter (pitch) at alpha = 0
+                PTya: y-axis torque parameter linear in alpha
+                PTywy: y-axis torque parameter linear in y-axis angular velocity
+                PTxwx: x-axis torque parameter linear in x-axis angular velocity
+                PTxwz: x-axis torque parameter linear in z-axis angular velocity
+                PTzwz: z-axis torque parameter linear in z-axis angular velocity
+                """
+                if isinstance(args[0],numpy.ndarray): args = args[0]
+                PL0,PLa,PD0,PDa,PTya,PTywy,PTy0,PTxwx,PTxwz,PTzwz=args
+		self.PL0=PL0 
+		self.PLa=PLa 
+		self.PD0=PD0 
+		self.PDa=PDa 
+		self.PTxwx=PTxwx 
+		self.PTxwz=PTxwz 
+		self.PTy0=PTy0 
+		self.PTya=PTya 
+		self.PTywy=PTywy 
+		self.PTzwz=PTzwz 
+
+        def __str__(self):
+                outstr = "Model:\n"+\
+                         "PL0=%.2e\tPLa=%.2e\n"%(self.PL0,self.PLa)+\
+                         "PD0=%.2e\tPDa=%.2e\n"%(self.PD0,self.PDa)+\
+                         "PTxwx=%2.e\tPTxwz=%.2e\n"%(self.PTxwx,self.PTxwz)+\
+                         "PTy0=%.2e\tPTwa=%.2e\tPTywy=%.2e\n"%(self.PTy0,self.PTya,self.PTywy)+\
+                         "PTzwz=%.2e"%(self.PTzwz)
+                return outstr
+
+        """
+        Coefficient functions.
+        """
+	def C_lift(self,alpha):
+		return self.PL0 + self.PLa*alpha
+
+	def C_drag(self,alpha):
+		return self.PD0 + self.PDa*(alpha-alpha_0)*(alpha-alpha_0)
+
+	def C_x(self,wx,wz):
+		return self.PTxwz*wz + self.PTxwx*wx
+
+	def C_y(self,alpha,wy):
+		return self.PTy0 + self.PTywy*wy + self.PTya*alpha
+
+	def C_z(self,wz):
+		return self.PTzwz*wz
+
+#An example of initializing and printing a model
+if __name__ == "__main__":
+        test_model = Model(0.33,1.9,0.18,0.69,0.43,-1.4e-2,-8.2e-2,-1.2e-2,-1.7e-3,-3.4e-5)
+\end{verbatim}
+\section*{Appendix B}
+\begin{verbatim}
+#Developers: Tom McClintock, Elizabeth Hannah
+import numpy as np
+import math
+import model_object
+
+rho=1.225 #kg/m^3, density of air
+area=0.057 #m^2, area of disc used in Hummel 2003
+m=0.175 #kg, mass of disc used in Hummel 2003
+g=9.81 #m/s^2, gravitational acceleration
+F_gravity = m*g*np.array([0.,0.,-1.]) #gravitational force
+Izz=0.002352 #kg-m^2
+Ixx=Iyy=Ixy=0.001219 #kg-m^2
+d=2*(area/math.pi)**0.5 ##m; diameter of disc
+#---------------------------------------------------------------------------------------------------#
+
+#Create a Frisbee class, and assign Frisbee self values that correspond 
+#to initial conditions (positions) of the frisbee.
+class Frisbee(object):
+  def __init__(self,x,y,z,vx,vy,vz,phi,theta,gamma, phidot,thetadot,gammadot,debug=False):
+    self.debug=debug #Default value is false if debug isn't specified.
+    self.x=x 
+    self.y=y
+    self.z=z
+    self.vx=vx
+    self.vy=vy
+    self.vz=vz
+    self.phi=phi
+    self.theta=theta
+    self.gamma=gamma
+    self.phidot=phidot
+    self.thetadot=thetadot
+    self.gammadot=gammadot
+    self.update_data_fields() #Calculate all vectors and matrices
+    
+  #Represent Frisbee object by printing instantaneous positions and velocities.
+  def __str__(self):
+    outstr = "Position: (%f,%f,%f)\n"%(self.x,self.y,self.z)+          "Velocity: (%f,%f,%f)\n"%(self.vx,self.vy,self.vz)
+    outstr+= "Angles:   (%f,%f,%f)\n"%(self.phi,self.theta,self.gamma)+"AngVelos: (%f,%f,%f)\n"%(self.phidot,self.thetadot,self.gammadot)
+    return outstr
+
+  def initialize_model(self,PL0, PLa, PD0, PDa, PTya, PTywy, PTy0, PTxwx, PTxwz, PTzwz):
+    self.model=model_object.Model(PL0, PLa, PD0, PDa, PTya, PTywy, PTy0, PTxwx, PTxwz, PTzwz)
+
+#---------------------------------------------------------------------------------------------------#
+
+  #A function that returns the positions of the frisbee as it currently is
+  def get_positions(self):
+    return [self.x,self.y,self.z,self.vx,self.vy,self.vz,self.phi,self.theta,self.gamma,self.phidot,self.thetadot,self.gammadot]
+
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Update the data fields in the frisbee that need to be used in the calculation,
+  #namely the rotation matrix, the bhat vectors, the angle of attack, the velocity, etc.
+  def update_data_fields(self):
+    self.calculate_trig_functions()
+    self.velocity = np.array([self.vx,self.vy,self.vz])
+    self.angle_dots = np.array([self.phidot,self.thetadot,self.gammadot])
+    self.vhat = self.velocity/np.linalg.norm(self.velocity)
+    self.v2 = np.dot(self.velocity,self.velocity)
+    self.rotation_matrix = self.calc_rotation_matrix()
+    self.xbhat,self.ybhat,self.zbhat = self.calc_body_hat_vectors()
+    self.angle_of_attack = self.calc_angle_of_attack()
+    self.angular_velocity_frisframe = self.calc_angular_velocity_frisframe()
+    self.angular_velocity_labframe = np.dot(self.angular_velocity_frisframe,self.rotation_matrix)
+    self.wxb,self.wyb,self.wzb = self.calc_angular_velocity()
+    return #Success
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculates the trigonometric functions of the Euler angles of our frisbee
+  def calculate_trig_functions(self):
+    self.sin_phi = np.sin(self.phi)
+    self.cos_phi = np.cos(self.phi)
+    self.sin_theta = np.sin(self.theta)
+    self.cos_theta = np.cos(self.theta)
+    return #Success
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate rotation matrix. Rotation matrix is the product Ry(theta)*Rx(phi) of "Euler Chained Rotation
+  #Matrices", found at https://en.wikipedia.org/wiki/Davenport_chained_rotations. 
+  def calc_rotation_matrix(self):
+    sp,cp = self.sin_phi,  self.cos_phi
+    st,ct = self.sin_theta,self.cos_theta
+    return np.array([[ct, sp*st, -st*cp],
+                     [0, cp, sp],
+                     [st, -sp*ct, cp*ct]])
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate the body hat vectors.
+  def calc_body_hat_vectors(self):
+    v = self.velocity
+    #The z-body hat vectory.
+    zbhat = self.rotation_matrix[2] #The lower row
+    #Calculate the unit vector in the x-body direction. Corresponds to the velocity
+    #unit vector in the plane of the disc.
+    zcomponent = np.dot(v,zbhat) #This is the lab-frame velocity vector
+    vplane = v - (zbhat*zcomponent) #Velocity in the plane of the disc's motion
+    xbhat = vplane/np.linalg.norm(vplane) #Unit vector int the plane of the disc
+    #Calculate the unit vector in the y-body direction.
+    ybhat = np.cross(zbhat,xbhat)
+    return [xbhat,ybhat,zbhat]
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate angle of attack, defined as angle between plane of disc and velocity vector
+  #of the frisbee's motion. First step is to calculate scalar component of the velocity 
+  #that is not in the plane of the disc (dot product of z-body unit vector and velocity
+  #vector). We then subtract the scalar component calculated above times the z-body unit
+  #vector itself from the velocity vector. This gives us the velocity in the plane of the
+  #disc. The angle of attack is the angle formed between the z-component of the velocity and the velocity
+  #in the plane of the disc, which we calculate using an arctan function.
+  def calc_angle_of_attack(self):
+    v = self.velocity
+    zbhat = self.zbhat
+    zcomponent = np.dot(v,zbhat)
+    v_plane = v - zbhat*zcomponent
+    return -math.atan(zcomponent/np.linalg.norm(v_plane))
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate the angular velocity in the frisbee frame. This is the \vec{w} quantity
+  #Note that this is not \vec{w}_F.
+  #Details found on page 34 in Hummell's thesis
+  def calc_angular_velocity_frisframe(self):
+    st,ct = self.sin_theta,self.cos_theta
+    return np.array([self.phidot*ct, self.thetadot, self.phidot*st + self.gammadot])
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate the angular velocities rotated into the lab frame but dotted into
+  #the body-hat vectors as expressed in the lab frame (i.e. xbhat).
+  def calc_angular_velocity(self):
+    av_labframe = self.angular_velocity_labframe
+    xbhat,ybhat,zbhat = self.xbhat,self.ybhat,self.zbhat
+    wxb = np.dot(av_labframe,xbhat)
+    wyb = np.dot(av_labframe,ybhat)
+    wzb = np.dot(av_labframe,zbhat)
+    return [wxb,wyb,wzb]
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate forces acting on Frisbee
+
+  def get_force(self):
+    alpha, v2 = self.angle_of_attack, self.v2
+    vhat,ybhat = self.vhat,self.ybhat
+    force_amplitude = 0.5*rho*area*v2
+    F_lift = self.model.coef_lift(alpha)*force_amplitude*np.cross(vhat,ybhat)
+    F_drag = self.model.coef_drag(alpha)*force_amplitude*(-vhat)
+    total_force=F_lift+F_drag+F_gravity
+    if self.debug:
+      print "In get_forces"
+      print "\tCL:",self.model.coef_lift(alpha)
+      print "\tCD:",self.model.coef_drag(alpha)
+      print "\tAmplitude:",force_amplitude
+      print "\tF_lift/m:",F_lift/m
+      print "\tF_drag/m:",F_drag/m
+      print "\tF_grav/m:",F_gravity/m
+    return total_force
+
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate torques acting on Frisbee
+
+  def get_torque(self):
+    #Calculate alpha and velocity^2
+    alpha=self.angle_of_attack
+    v2=self.v2
+
+    #Get x,y,z components of angular velocity
+    wxb,wyb,wzb = self.wxb,self.wyb,self.wzb
+
+    #X-body torque; Note: in the frisbee frame
+    torque_amplitude = 0.5*rho*d*area*v2
+    roll_moment  = self.model.coef_roll(wxb,wzb)*torque_amplitude*self.xbhat
+    #Y-body torque; Note: in the frisbee frame
+    pitch_moment = self.model.coef_pitch(alpha,wyb)*torque_amplitude*self.ybhat
+    #Z-body torque; Note: already in the lab frame
+    spin_moment  = self.model.coef_spin(wzb)*torque_amplitude*np.array([0,0,1.])
+
+    #Total torque - We rotate from the frisbee frame into the lab frame
+    rotation_matrix = self.rotation_matrix
+    total_torque=np.dot(rotation_matrix,roll_moment+pitch_moment)+spin_moment
+
+    #Use this to shut off the torques if you want
+    #total_torque *= 0
+
+    if self.debug:
+      print "In get_torque"
+      print "\tRoll amp:",self.model.coef_roll(wxb,wzb)*torque_amplitude
+      print "\tPitch amp:", self.model.coef_pitch(alpha,wyb)*torque_amplitude
+      print "\tSpin amp:",self.model.coef_spin(wzb)*torque_amplitude
+      print "\tRaw moments:",roll_moment,pitch_moment,spin_moment
+      print "\tLab moments:",np.dot(rotation_matrix,roll_moment),np.dot(rotation_matrix,pitch_moment),spin_moment
+      print "\ttotal_torque:",total_torque
+    return total_torque
+#---------------------------------------------------------------------------------------------------#
+
+  #Calculate derivatives of phidot, thetadot, and gammadot, which correspond to angular acceleration
+  #values for phi, theta, and gamma. Units are radians/sec^2. Equations can be found in Hummel 2003 (pg. 48)
+
+  def ang_acceleration(self):
+    total_torque = self.get_torque()
+    st,ct = self.sin_theta,self.cos_theta
+    phidot,thetadot,gammadot = self.phidot, self.thetadot, self.gammadot
+
+    phi_dd   = (total_torque[0] + 2*Ixy*thetadot*phidot*st - Izz*thetadot*(phidot*st + gammadot))/(ct*Ixy)
+    theta_dd = (total_torque[1] + Izz*phidot*ct*(phidot*st+gammadot) - Ixy*phidot*phidot*ct*st)/Ixy
+    gamma_dd = (total_torque[2] - Izz*(phidot*thetadot*ct + phi_dd*st))/Izz
+
+    if self.debug:
+      print "In ang_acceleration:"
+      print "\tphi_dd parts:",total_torque[0],2*Ixy*thetadot*phidot*st,Izz*thetadot*(phidot*st+gammadot)
+      print "\ttheta_dd parts:",total_torque[1],Izz*phidot*ct*(phidot*st+gammadot),Ixy*phidot**2*ct*st
+      print "\tgamma_dd parts:",total_torque[2],-Izz*(phidot*thetadot*ct + phi_dd*st)
+    return np.array([phi_dd, theta_dd, gamma_dd])
+#---------------------------------------------------------------------------------------------------#
+
+  #Create array of derivatives to feed into numerical integrator
+  #variable_array=[x-velocity, y-velocity, z velocity
+    #x-accelration, y-acceleration, z-acceleration,
+    #phi ang. velocity, theta ang. velocity, gamma ang. velocity
+    #phi ang. acceleration, theta ang. acceleration, gamma ang. acceleration]
+
+  def derivatives_array(self):
+    if self.debug:
+      print "" #print a blank line
+    self.update_data_fields()
+    derivatives = np.zeros(12)
+    derivatives[0:3] = self.velocity
+    derivatives[3:6] = self.get_force()/m
+    derivatives[6:9] = self.angle_dots
+    derivatives[9:12]= self.ang_acceleration()
+    if self.debug:
+      print "In derivatives_array:"
+      print "\tvelocities: ",derivatives[0:3]
+      print "\tforces/m: ",derivatives[3:6]
+      print "\tangle dots: ",derivatives[6:9]
+      print "\tang_accs: ",derivatives[9:12]
+    return derivatives
+
+
+\end{verbatim}
+\section*{Appendix C}
+\begin{verbatim}
+#---------------------------------------------------------------------------------------------------#
+#Developers: Tom McClintock, Elizabeth Hannah
+
+#Initialize frisbee object with appropriate coefficient values and initial conditions.
+#Current parameter input values obtained from Hummel 2003 (pg. 82)
+#Change to debug=False to supress printing
+init_positions = [0.,0.,1.,20.,0.,0.,0.,-.087,0.,0.,0.,-50.]
+test_fris=frisbee_object.Frisbee(0.,0.,1.,20.,0.,0.,0.,-5.0*np.pi/180.,0.,0.,0.,-50.,debug=False)
+
+#We pass the model directly to the frisbee
+model = model_object.Model(PL0=0.3331, PLa=1.9124,PD0=0.1769,PDa=0.685,
+                           PTya=0.4338,PTywy=-0.0144,PTy0=-0.0821,
+                           PTxwx=-0.0125,PTxwz=-0.00171,
+                           PTzwz=-0.0000341)
+test_fris.model=model
+#test_fris.initialize_model(0.331,1.9124,0.1769,0.685,  0.4338,0.0144,0.0821,  0.0125,0.00171,0.0000341)
+
+#print("Initial derivatives: ",test_fris.derivatives_array())
+#sys.exit()
+#---------------------------------------------------------------------------------------------------#
+#Define function to feed into ODE integrator. The function will compute all relevant derivatives
+#at time t, defined in main. All derivatives are explained and calculated in frisbee_object.py
+#module, and an array of derivatives is called below.
+
+def old_equations_of_motion(positions, t):
+
+    #Update the positions of the frisbee
+    (test_fris.x,test_fris.y,test_fris.z,
+     test_fris.vx,test_fris.vy,test_fris.vz,
+     test_fris.phi,test_fris.theta,test_fris.gamma,
+     test_fris.phidot,test_fris.thetadot,test_fris.gammadot)=positions
+    
+    #If it is on the ground, turn all derivatives to 0.
+    if test_fris.z <= 0.0:
+        return np.zeros_like(positions)
+
+    #Calculate all derivatives based on current positions. Return array of derivatives.
+    positionsdot=test_fris.derivatives_array()
+    return positionsdot
+
+
+def equations_of_motion(positions, t, frisbee):
+
+    #Update the positions of the frisbee
+    (frisbee.x,frisbee.y,frisbee.z,
+     frisbee.vx,frisbee.vy,frisbee.vz,
+     frisbee.phi,frisbee.theta,frisbee.gamma,
+     frisbee.phidot,frisbee.thetadot,frisbee.gammadot)=positions
+
+    
+    #If it is on the ground, turn all derivatives to 0.
+    if frisbee.z <= 0.0:
+        return np.zeros_like(positions)
+
+    #Calculate all derivatives based on current positions. Return array of derivatives.
+    positionsdot=frisbee.derivatives_array()
+    #print positionsdot
+    return positionsdot
+
+#---------------------------------------------------------------------------------------------------#
+def main():
+
+    #Integration of ODEs that reflect equations of motion.
+    #Common release conditions obtained from Hummel 2003 (pg. 83)
+
+    #The starting positions are a copy of the test frisbee's
+    #positions at the start of this main() function.
+    initial_positions=np.array(test_fris.get_positions()).copy()
+
+    #Define initial and final times
+    ti=0.0
+    tf = 3.0
+
+    #Define number of steps and calculate step size
+    n = 1000
+    dt=(tf-ti)/(n-1)
+
+    #Create time array
+    time=np.arange(ti,tf,dt)
+    np.savetxt("solutiontime.txt",time)
+    #time=np.linspace(ti,tf, n)
+
+    """
+    THIS IS A SIMPLE RK4 ODE SOLVER WRITTEN BY TOM FOR DEBUGGING
+    """
+    """solution = np.zeros((n,12))
+    positions = np.array(initial_positions).copy()
+    for i in range(n):
+        print "\n\nAt t = %f"%time[i]
+        print test_fris
+        solution[i] = positions.copy()
+        k1 = np.array(equations_of_motion(positions,time[i]))
+        temp = positions + k1*dt/2.
+        k2 = np.array(equations_of_motion(temp,time[i]+dt/2.))
+        temp = positions + k2*dt/2.
+        k3 = np.array(equations_of_motion(temp,time[i]+dt/2.))
+        temp = positions + k3*dt
+        k4 = np.array(equations_of_motion(temp,time[i]+dt))
+        positions = positions + dt/6.*(k1+2*k2+2*k3+k4)
+
+        #print [positions[:]]
+        #print "positions:",test_fris.get_positions()
+    sys.exit()
+    """
+
+    solution=odeint(equations_of_motion, initial_positions, time)
+    np.savetxt("solution.txt",solution)
+    solution = np.loadtxt("solution.txt")
+#---------------------------------------------------------------------------------------------------#
+
+    #Graph solutions to analyze relevance and assess code.
+    
+    '''
+    for i in xrange(0,12):
+        derivativenames=(['x-Position (m)','y-Position (m)','z-Position (m)','vx (x-velocity (m/s))','vy (y-velocity (m/s))','vz (z-velocity (m/s))',
+            'Phi','Theta','Gamma','phidot (phi angular velocity (radians/s))','thetadot (theta angular velocity (radians/s))',
+            'gammadot (gamma angular velocity (radians/s))'])
+        fig=plt.figure()
+        plt.plot(time, solution[:,i])
+        plt.ylabel(derivativenames[i])
+        plt.xlabel('Time (Seconds)')
+        plt.draw()
+        plt.pause(1)
+        raw_input('Press enter to close.')
+        plt.close(fig)
+    '''
+    
+    #sys.exit()
+    fig=plt.figure()
+    ax=fig.add_subplot(111, projection='3d')
+    #ax.set_aspect('equal','box')
+    ax.set_xlim(0,30)
+    ax.set_ylim(-15,15)
+    ax.set_zlim(0,30)
+    plt.plot(solution[:,0], solution[:,1], solution[:,2])
+    plt.draw()
+    plt.pause(1)
+    raw_input('Press enter to close.')
+    plt.close(fig)
+
+if __name__ == '__main__':
+    main()
+\end{verbatim}
+\section*{Appendix D}
+\begin{verbatim}
+#Developer: Tom McClintock
+
+"""
+This analyzes the simulated throw.
+This mirrors how the analysis will look when
+it is run on real data.
+"""
+import os, sys
+import numpy as np
+from scipy.interpolate import InterpolatedUnivariateSpline as IUS
+import matplotlib.pyplot as plt
+import emcee, corner
+sys.path.insert(0,"../")
+import frisbee
+
+#Read in the trajectory
+trajectory = np.genfromtxt("../test_data/simulated_trajectory.txt")
+t,x,y,z,xe,ye,ze = trajectory.T
+data = np.array([t,x,y,z,xe,ye,ze])
+
+#True starting condtions of kinematic variables we don't test
+vx,vy,vz = 10.0,0.0,0.0
+phi,theta,gamma = 0.0,0.0,0.0
+phidot,thetadot,gammadot = 0.0,0.0,50.0 #radians/sec
+
+#Times
+time_initial = 0.0
+time_final = 3.0
+N_times = int((time_final-time_initial)/0.0033333) #300 times/sec
+times = np.linspace(time_initial,time_final,N_times)
+
+#This is for if we only test a few parameters at a time
+true_model = np.array([0.33,1.9,0.18,0.69,0.43,-1.4e-2,-8.2e-2,-1.2e-2,-1.7e-3,-3.4e-5])
+def get_full_model(params):
+    """
+    This function converts our 'mini model', or
+    just a few parameters, to the full model
+    with all the parameters. Must be changed by
+    hand when more parameters are looked at.
+    """
+    PL0 = params[0]
+    model = true_model.copy()
+    model[0] = PL0
+    return model
+
+#The prior
+def lnprior(params):
+    #Flat priors with a cutoff at |1|
+    if any([np.fabs(params)>=1.0]): return -np.inf
+    return 0
+
+#The likelihood
+def lnlike(params,data):
+    model = get_full_model(params)
+    t,x,y,z,x_err,y_err,z_err = data
+    test_frisbee = frisbee.Frisbee(x[0],y[0],z[0],
+                                   vx,vy,vz,
+                                   phi,theta,gamma,
+                                   phidot,thetadot,gammadot)
+    test_frisbee.initialize_model(model)
+    times,test_trajectory = test_frisbee.get_trajectory(time_initial,time_final)
+    x_test,y_test,z_test = test_trajectory.T[:3]
+    x_spline = IUS(times,x_test)
+    y_spline = IUS(times,y_test)
+    z_spline = IUS(times,z_test)
+    xchi2 = -0.5*sum((x-x_spline(t))**2/(x_err**2))
+    ychi2 = -0.5*sum((y-y_spline(t))**2/(y_err**2))
+    zchi2 = -0.5*sum((z-z_spline(t))**2/(z_err**2))
+
+    return xchi2+ychi2+zchi2
+
+#The posterior
+def lnpost(params,data):
+    lp = lnprior(params)
+    if not np.isfinite(lp): return -np.inf
+    return lp + lnlike(params,data)
+
+#Set up the walkers in parameter space
+test_params = [0.33] #PL0
+print lnpost(test_params,data)
+nwalkers = 4
+ndim = 1
+pos = np.zeros((nwalkers,ndim))
+for i in xrange(0,nwalkers):
+    pos[i] = test_params + 0.5*np.fabs(test_params)*np.random.randn(ndim)
+
+#Run emcee
+sampler = emcee.EnsembleSampler(nwalkers,ndim,lnpost,args=(data,))
+nsteps = 6000
+sampler.run_mcmc(pos,nsteps)
+
+fullchain = sampler.chain.reshape((-1,ndim))
+nburn = 500
+chain = fullchain[int(nburn):]
+np.savetxt("PL0_fullchain_n=6000.txt",fullchain)
+fig = corner.corner(chain)
+plt.show()
+
+\end{verbatim}
 \end{document}  
